@@ -115,13 +115,20 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug || true
+          cd ..
+          mkdir -p dist-android
+          if [ -f android/app/build/outputs/apk/debug/app-debug.apk ]; then
+            cp android/app/build/outputs/apk/debug/app-debug.apk dist-android/OmniPDF-Studio-Android.apk
+          elif [ -f OmniPDF-Studio-Android.apk ]; then
+            cp OmniPDF-Studio-Android.apk dist-android/OmniPDF-Studio-Android.apk
+          fi
 
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: android-release
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: dist-android/*.apk
 
   # 5. CONSOLIDATE & PUBLISH GITHUB RELEASE
   publish-release:
