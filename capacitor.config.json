@@ -1,0 +1,11 @@
+{
+  "appId": "com.velastra.omnipdf",
+  "appName": "OmniPDF Studio",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}

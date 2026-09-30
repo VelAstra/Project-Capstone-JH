@@ -1,0 +1,40 @@
+{
+  "name": "omnipdf-studio",
+  "version": "1.0.0",
+  "description": "Aplikasi Manipulasi PDF Offline Multiplatform (Windows, Linux, macOS, Android) - Capstone Project",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node test/pdf-engine.test.mjs",
+    "electron:dev": "vite build && electron .",
+    "electron:build": "vite build && electron-builder",
+    "cap:build": "vite build && npx cap sync android"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VelAstra/Project-Capstone-JH.git"
+  },
+  "keywords": [
+    "pdf",
+    "pdf-tools",
+    "offline-pdf",
+    "multiplatform",
+    "windows",
+    "linux",
+    "macos",
+    "android",
+    "capstone"
+  ],
+  "author": "VelAstra",
+  "license": "GPL-3.0"
+}
