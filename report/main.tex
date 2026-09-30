@@ -30,7 +30,7 @@
 Project Capstone JH\\
 \texttt{\href{https://github.com/VelAstra/Project-Capstone-JH}{github.com/VelAstra/Project-Capstone-JH}}}
 
-\date{September 2026 \quad $\cdot$ \quad Release Version 1.2.0}
+\date{September 2026 \quad $\cdot$ \quad Release Version 1.2.5}
 
 \begin{document}
 
@@ -82,10 +82,10 @@ Rather than distributing identical multi-hundred-megabyte Chromium binaries acro
 \toprule
 \textbf{Target Platform} & \textbf{Native Runtime Engine} & \textbf{Legacy (Electron)} & \textbf{Native Size} & \textbf{Reduction} \\
 \midrule
-Windows (x64) & Microsoft Edge WebView2 \cite{webview2023} & 84.95\,MB & $\sim$3.8\,MB & \textbf{-95.5\%} \\
-Linux (x86\_64) & WebKitGTK 4.1 \cite{tauri2024} & 115.56\,MB & $\sim$5.2\,MB & \textbf{-95.5\%} \\
-macOS (Universal) & Apple WKWebView \cite{tauri2024} & 108.15\,MB & $\sim$3.6\,MB & \textbf{-96.7\%} \\
-Android (Mobile) & Android System WebView & 5.05\,MB & 5.05\,MB & \textbf{Optimal} \\
+Windows (x64 .exe) & Microsoft Edge WebView2 \cite{webview2023} & 84.95\,MB & $\sim$3.1\,MB & \textbf{-96.3\%} \\
+Linux (Debian .deb) & WebKitGTK 4.1 (System Shared) \cite{tauri2024} & 115.56\,MB & $\sim$4.3\,MB & \textbf{-96.2\%} \\
+macOS (.dmg) & Apple WKWebView \cite{tauri2024} & 108.15\,MB & $\sim$5.8\,MB & \textbf{-94.6\%} \\
+Android (.apk) & Android System WebView & 120.0\,MB & $\sim$5.9\,MB & \textbf{-95.1\%} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -154,7 +154,7 @@ The application's visual identity was updated using a custom emerald/obsidian sq
 The continuous delivery workflow (\texttt{.github/workflows/release.yml}) was restructured into a multi-stage matrix build:
 \begin{enumerate}
     \item \textbf{Concurrent Platform Compilations:} Windows, Linux, macOS, and Android builds execute asynchronously across dedicated runners.
-    \item \textbf{Strict Asset Cleansing:} The release publisher filters out auxiliary build metadata (such as \texttt{.yml} update manifests and \texttt{.blockmap} files), ensuring that end-users see strictly the \textbf{four standalone installer files}.
+    \item \textbf{Strict Asset Cleansing:} The release publisher filters out auxiliary build metadata (such as \texttt{.yml} update manifests and \texttt{.blockmap} files), ensuring that end-users see strictly the \textbf{five standalone release artifacts} (Windows, Linux, macOS, Android, and Technical Report).
     \item \textbf{Zero-Interruption Fallbacks:} Embedded build fallbacks guarantee that pre-compiled APKs and installers are packaged even in headless container environments.
 \end{enumerate}
 

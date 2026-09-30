@@ -80,10 +80,10 @@ jobs:
       - name: Package Linux Binary
         run: |
           mkdir -p dist-release
-          if compgen -G "src-tauri/target/release/bundle/appimage/*.AppImage" > /dev/null; then
-            cp src-tauri/target/release/bundle/appimage/*.AppImage dist-release/OmniPDF-Studio-Linux.AppImage
-          elif compgen -G "src-tauri/target/release/bundle/deb/*.deb" > /dev/null; then
+          if compgen -G "src-tauri/target/release/bundle/deb/*.deb" > /dev/null; then
             cp src-tauri/target/release/bundle/deb/*.deb dist-release/OmniPDF-Studio-Linux.deb
+          elif compgen -G "src-tauri/target/release/bundle/appimage/*.AppImage" > /dev/null; then
+            cp src-tauri/target/release/bundle/appimage/*.AppImage dist-release/OmniPDF-Studio-Linux.AppImage
           elif [ -f "src-tauri/target/release/omnipdf-studio" ]; then
             cp src-tauri/target/release/omnipdf-studio dist-release/OmniPDF-Studio-Linux
           fi
@@ -206,8 +206,8 @@ jobs:
       - name: Publish Clean GitHub Release with 4 Binaries and Technical Report
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.4' }}
-          name: "OmniPDF Studio ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.4' }} - Official Multiplatform Release"
+          tag_name: ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.5' }}
+          name: "OmniPDF Studio ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.5' }} - Official Multiplatform Release"
           draft: false
           prerelease: false
           generate_release_notes: false

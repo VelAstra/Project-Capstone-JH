@@ -27,15 +27,15 @@
 
 ## 📥 Unduh Installer Aplikasi Langsung (Siap Pakai Tanpa CLI)
 
-Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh berkas yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.2.4](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.4):
+Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh berkas yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.2.5](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.5):
 
 | Platform | Format Berkas | Ukuran | Arsitektur Runtime | Tautan Unduhan Langsung |
 | :--- | :--- | :--- | :--- | :--- |
-| 🪟 **Windows** | `.exe` (Single File) | **~3.12 MB** | Native Microsoft Edge WebView2 (.NET) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.4/OmniPDF-Studio-Windows-x64.exe) |
-| 🍎 **macOS** | `.dmg` | **~5.87 MB** | Tauri v2 + Apple WKWebView | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.4/OmniPDF-Studio-macOS.dmg) |
-| 📱 **Android** | `.apk` | **~5.94 MB** | Android System WebView (Capacitor) | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.4/OmniPDF-Studio-Android.apk) |
-| 🐧 **Linux** | `.AppImage` | **~79.38 MB** | Tauri v2 + WebKitGTK 4.1 | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.4/OmniPDF-Studio-Linux.AppImage) |
-| 📄 **Dokumentasi** | `.pdf` (LaTeX) | **~0.19 MB** | Laporan Rekayasa & Arsitektur IEEE | [Unduh OmniPDF-Studio-Technical-Report.pdf](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.4/OmniPDF-Studio-Technical-Report.pdf) |
+| 🪟 **Windows** | `.exe` (Single File) | **~3.12 MB** | Native Microsoft Edge WebView2 (.NET) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.5/OmniPDF-Studio-Windows-x64.exe) |
+| 🍎 **macOS** | `.dmg` | **~5.87 MB** | Tauri v2 + Apple WKWebView | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.5/OmniPDF-Studio-macOS.dmg) |
+| 📱 **Android** | `.apk` | **~5.94 MB** | Android System WebView (Capacitor) | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.5/OmniPDF-Studio-Android.apk) |
+| 🐧 **Linux** | `.deb` (Debian/Ubuntu) | **~4.37 MB** | Tauri v2 + System WebKitGTK 4.1 | [Unduh OmniPDF-Studio-Linux.deb](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.5/OmniPDF-Studio-Linux.deb) |
+| 📄 **Dokumentasi** | `.pdf` (LaTeX) | **~0.19 MB** | Laporan Rekayasa & Arsitektur IEEE | [Unduh OmniPDF-Studio-Technical-Report.pdf](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.5/OmniPDF-Studio-Technical-Report.pdf) |
 
 ---
 
@@ -130,7 +130,7 @@ Aplikasi mengusung estetika **Flat Design** modern dengan kontras warna yang nya
 * **Desktop Wrappers & Native WebView Hosts**:
   * **Windows**: [.NET 10 Windows Forms Host](https://dotnet.microsoft.com/) dengan runtime bawaan Microsoft Edge WebView2 (~3.04 MB single-file standalone executable).
   * **macOS**: [Tauri v2](https://tauri.app/) dengan core Rust dan Apple WKWebView (~5.87 MB DMG).
-  * **Linux**: [Tauri v2](https://tauri.app/) dengan WebKitGTK 4.1 (~79.38 MB universal AppImage).
+  * **Linux**: [Tauri v2](https://tauri.app/) dengan WebKitGTK 4.1 (~4.37 MB native Debian/Ubuntu `.deb` package).
 * **Mobile Shell**:
   * [Capacitor Android](https://capacitorjs.com/) dengan Android System WebView (~5.43 MB APK).
 
