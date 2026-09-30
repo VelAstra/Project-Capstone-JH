@@ -204,7 +204,7 @@ jobs:
           name: android-release
           path: all-releases/android
 
-      - name: Publish Clean GitHub Release with Only 4 Binaries
+      - name: Publish Clean GitHub Release with 4 Binaries and Technical Report
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.1.0' }}
@@ -218,5 +218,6 @@ jobs:
             all-releases/linux/*
             all-releases/macos/*
             all-releases/android/*
+            report/*.pdf
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

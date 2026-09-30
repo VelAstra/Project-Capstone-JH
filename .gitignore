@@ -128,4 +128,16 @@ preview*.png
 thumb_*.png
 test_*.svg
 test.svg
+
+# ------------------------------------------------------------------------------
+# 9. LaTeX Auxiliary Build Files
+# ------------------------------------------------------------------------------
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
 scratch/

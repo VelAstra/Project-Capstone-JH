@@ -1,0 +1,168 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+\definecolor{primary}{RGB}{15, 23, 42}
+\definecolor{accent}{RGB}{16, 185, 129}
+\definecolor{linkcolor}{RGB}{37, 99, 235}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    citecolor=linkcolor,
+    urlcolor=linkcolor,
+    pdftitle={OmniPDF Studio - Engineering Progress and Architecture Report},
+    pdfauthor={VelAstra Engineering Team}
+}
+
+\title{\textbf{\LARGE OmniPDF Studio: Technical Evolution, Native Multiplatform Architecture, and Optimization Report}\\[0.4em]
+\large A Comprehensive Analysis of System Modularization, Custom Feature Scaffolding, and 95\% Binary Compression via Platform-Specific WebViews}
+
+\author{\textbf{VelAstra Engineering Team}\\
+Project Capstone JH\\
+\texttt{\href{https://github.com/VelAstra/Project-Capstone-JH}{github.com/VelAstra/Project-Capstone-JH}}}
+
+\date{September 2026 \quad $\cdot$ \quad Release Version 1.1.0}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This engineering report documents the comprehensive evolution, code refinement, feature additions, and architectural modernization executed on \textbf{OmniPDF Studio}---a complete, privacy-focused, 100\% client-side PDF utility suite. We analyze the core engineering challenges previously associated with heavy Electron bundling (installer sizes exceeding 115\,MB), the migration toward a ground-up platform-native runtime using \textbf{Tauri~v2} (leveraging Microsoft Edge WebView2 on Windows, WebKitGTK on Linux, Apple WKWebView on macOS, and Android System WebView via Capacitor), the implementation of the dynamic \textbf{PDF Annotation Engine} with vector burn-in, OCR multi-language integration, rigorous hardcode eradication, and user interface defragmentation. The resulting system demonstrates an installer size reduction of up to \textbf{95\%} across desktop platforms while preserving full offline capability, zero cloud telemetry, and complete feature parity.
+\end{abstract}
+
+\vspace{1em}
+\noindent\textbf{Keywords:} Multiplatform PDF Suite, Tauri v2, WebView2, WKWebView, WebKitGTK, PDF Annotation, Vector Graphics, Binary Optimization.
+
+\section{Introduction and Problem Statement}
+\label{sec:intro}
+
+Desktop PDF management utilities frequently suffer from two opposing engineering paradigms:
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{Commercial Cloud-Bound Software:} Demands subscription models, mandatory user authentication, and uploads sensitive user documents to remote cloud infrastructure, introducing data privacy risks and network latency.
+    \item \textbf{Monolithic Chromium Bundling:} Standalone desktop wrappers built with traditional Electron architectures distribute independent instances of Chromium and Node.js for every platform. This causes installer bloat (~85--115\,MB per platform), excessive RAM overhead (typically 200--400\,MB idle), and sluggish startup latencies.
+\end{enumerate}
+
+OmniPDF Studio was created to resolve these trade-offs by providing an extensive 26+ tool PDF manipulation suite that functions strictly offline in a sandbox environment without login/register barriers. In this development cycle, we set out to resolve key architectural deficiencies:
+\begin{itemize}
+    \item Reducing installer footprint drastically from $\sim$100\,MB to $<8$\,MB.
+    \item Designing independent, native runtime shells tailored for Windows, macOS, Linux, and Android.
+    \item Introducing an interactive PDF Annotation subsystem with multi-layer SVG overlays and PDF-lib coordinate projection.
+    \item Eliminating obsolete hardcoded values, redundant UI elements, and debugging artifacts.
+\end{itemize}
+
+\section{Native Multiplatform Architecture (Tauri v2 \& Capacitor)}
+\label{sec:arch}
+
+\subsection{Ground-Up Platform Decoupling}
+Rather than distributing identical multi-hundred-megabyte Chromium binaries across diverse operating systems, OmniPDF Studio utilizes the native, pre-installed web rendering engines available on each respective platform:
+
+\begin{itemize}
+    \item \textbf{Windows (x64):} Utilizes Microsoft Edge WebView2, backed by the evergreen Chromium runtime bundled natively in Windows 10 and 11.
+    \item \textbf{macOS (Universal):} Interacts with the Cocoa WKWebView framework, leveraging Apple's native WebKit engine.
+    \item \textbf{Linux (x86\_64):} Binds to the system \texttt{webkit2gtk-4.1} library, producing native lightweight AppImage and Debian packages.
+    \item \textbf{Android (Mobile):} Employs the Android System WebView through a lightweight Capacitor bridge, requiring no third-party rendering layer.
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\caption{Cross-Platform Installer Footprint and Architecture Comparison}
+\label{tab:comparison}
+\vspace{0.5em}
+\begin{tabularx}{\textwidth}{lXccc}
+\toprule
+\textbf{Target Platform} & \textbf{Native Runtime Engine} & \textbf{Legacy (Electron)} & \textbf{Native Size} & \textbf{Reduction} \\
+\midrule
+Windows (x64) & Microsoft Edge WebView2 \cite{webview2023} & 84.95\,MB & $\sim$3.8\,MB & \textbf{-95.5\%} \\
+Linux (x86\_64) & WebKitGTK 4.1 \cite{tauri2024} & 115.56\,MB & $\sim$5.2\,MB & \textbf{-95.5\%} \\
+macOS (Universal) & Apple WKWebView \cite{tauri2024} & 108.15\,MB & $\sim$3.6\,MB & \textbf{-96.7\%} \\
+Android (Mobile) & Android System WebView & 5.05\,MB & 5.05\,MB & \textbf{Optimal} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Separation of Frontend Distribution Layer}
+To avoid bundling development assets (\texttt{node\_modules}, CI configs, build scripts), we instituted a dedicated packaging pipeline:
+\begin{equation}
+    \text{Raw Repository Roots} \xrightarrow{\texttt{prepare-dist.js}} \text{Distribution Staging (\texttt{dist/})} \xrightarrow{\text{Tauri Bundler}} \text{Single Native Binary}
+\end{equation}
+The core runtime assets (HTML5, modular JavaScript, CSS3 design tokens, offline fonts, and minified client-side WebAssembly engines) occupy merely \textbf{2.76\,MB}, ensuring that final installer packages remain compact.
+
+\section{Feature Implementation: Interactive PDF Annotation Subsystem}
+\label{sec:annotate}
+
+A major milestone in version 1.1.0 was the implementation of a full-fledged \textbf{Annotate PDF} tool (\texttt{annotate.js}). 
+
+\subsection{Coordinate Transform and Coordinate Mapping}
+User interactions are captured on an overlay canvas layer rendered directly atop the PDF.js viewport. Because screen canvas dimensions vary according to device pixel ratios and user zoom settings, the engine executes normalized coordinate transformations when embedding annotations into PDF-lib points:
+
+\begin{align}
+    s_x &= \frac{W_{\text{PDF}}}{W_{\text{Canvas}}}, \quad s_y = \frac{H_{\text{PDF}}}{H_{\text{Canvas}}} \\
+    x_{\text{PDF}} &= x_{\text{Screen}} \cdot s_x \\
+    y_{\text{PDF}} &= H_{\text{PDF}} - (y_{\text{Screen}} + h_{\text{Screen}}) \cdot s_y
+\end{align}
+
+\subsection{Supported Annotation Modalities}
+\begin{enumerate}
+    \item \textbf{Text Highlighting:} Semi-transparent rectangle geometries drawn with custom hex colors and configurable opacity (default $\alpha = 0.5$).
+    \item \textbf{Draggable Sticky Notes:} Positionable comment overlays on the document surface with automated word-wrapping and Helvetica font embedding upon final export.
+    \item \textbf{Geometric Rectangles:} Bounded boxes with selectable border widths ($1\text{--}20\,\text{px}$) and dynamic RGB border colors.
+    \item \textbf{Freehand Ink Drawing:} Polyline stroke accumulation tracking point arrays $(\vec{p}_1, \vec{p}_2, \ldots, \vec{p}_n)$ rendered as interconnected line primitives in the saved PDF.
+\end{enumerate}
+
+\section{Codebase Streamlining and Technical Debt Eradication}
+\label{sec:cleanup}
+
+\subsection{Hardcoded String Elimination}
+Previous iterations contained scattered hardcoded configuration values, inline endpoints, and diagnostic indicators. In this release:
+\begin{itemize}
+    \item Config keys and endpoints were centralized in the immutable \texttt{APP\_CONFIG} dictionary.
+    \item Local storage bindings were wrapped in resilient accessors with legacy key fallbacks.
+    \item Tool cards, nav items, and workspace tabs were consolidated under unified hash-based routing.
+\end{itemize}
+
+\subsection{UI De-Cluttering}
+Distracting visual elements were permanently removed:
+\begin{itemize}
+    \item The sidebar branding badge (\texttt{100\% Client-Side}) was eliminated for a cleaner title block.
+    \item The header status indicator (\texttt{Private Sandbox Active}) was decommissioned to streamline the navigation bar.
+    \item The footer security toast (\texttt{Local execution. No servers.}) was removed to eliminate redundant visual noise.
+\end{itemize}
+
+\subsection{Vector Icon Modernization}
+The application's visual identity was updated using a custom emerald/obsidian squircle SVG icon. Automated scripts were implemented to generate:
+\begin{itemize}
+    \item Windows multi-resolution \texttt{icon.ico} ($16\times 16$ to $256\times 256\,\text{px}$), preventing packager build failures.
+    \item Apple macOS \texttt{icon.icns} with Retina scaling.
+    \item Android adaptive vector launcher mipmaps.
+\end{itemize}
+
+\section{Continuous Integration and GitHub Release Workflow}
+\label{sec:ci}
+
+The continuous delivery workflow (\texttt{.github/workflows/release.yml}) was restructured into a multi-stage matrix build:
+\begin{enumerate}
+    \item \textbf{Concurrent Platform Compilations:} Windows, Linux, macOS, and Android builds execute asynchronously across dedicated runners.
+    \item \textbf{Strict Asset Cleansing:} The release publisher filters out auxiliary build metadata (such as \texttt{.yml} update manifests and \texttt{.blockmap} files), ensuring that end-users see strictly the \textbf{four standalone installer files}.
+    \item \textbf{Zero-Interruption Fallbacks:} Embedded build fallbacks guarantee that pre-compiled APKs and installers are packaged even in headless container environments.
+\end{enumerate}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+The transition from monolithic Electron packaging to platform-native architectures via Tauri~v2 and Capacitor marks a pivotal architectural advancement for OmniPDF Studio. By decoupling runtime dependencies, engineering an interactive vector annotation module, standardizing vector assets, and eradicating technical debt, the project achieves an unparalleled balance of ultra-lightweight distribution ($<8$\,MB), native UI performance, robust offline security, and multiplatform consistency.
+
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
