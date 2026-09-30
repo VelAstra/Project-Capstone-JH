@@ -1,6 +1,6 @@
 [package]
 name = "omnipdf-studio"
-version = "1.1.0"
+version = "1.2.0"
 description = "OmniPDF Studio"
 authors = ["VelAstra"]
 edition = "2021"
