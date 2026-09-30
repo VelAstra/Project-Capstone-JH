@@ -31,9 +31,25 @@ namespace OmniPdfStudio
 
     static class Program
     {
+        [System.Runtime.InteropServices.DllImport("shell32.dll", SetLastError = true)]
+        private static extern void SetCurrentProcessExplicitAppUserModelID([System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)] string AppID);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, IntPtr lParam);
+
+        private const int WM_SETICON = 0x80;
+        private const int ICON_SMALL = 0;
+        private const int ICON_BIG = 1;
+
         [STAThread]
         static void Main()
         {
+            try
+            {
+                SetCurrentProcessExplicitAppUserModelID("VelAstra.OmniPDFStudio.App");
+            }
+            catch { }
+
             ApplicationConfiguration.Initialize();
             
             var form = new Form
@@ -45,16 +61,64 @@ namespace OmniPdfStudio
                 StartPosition = FormStartPosition.CenterScreen
             };
 
-            var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConstants.IconFileName);
-            if (File.Exists(iconPath))
+            // Comprehensive multi-source icon resolution
+            Icon? appIcon = null;
+            try
             {
-                form.Icon = new System.Drawing.Icon(iconPath);
+                var assembly = Assembly.GetExecutingAssembly();
+                using var stream = assembly.GetManifestResourceStream("icon.ico")
+                                ?? assembly.GetManifestResourceStream("OmniPdfStudio.icon.ico");
+                if (stream != null)
+                {
+                    appIcon = new Icon(stream);
+                }
             }
-            else
+            catch { }
+
+            if (appIcon == null)
             {
-                var parentIcon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", AppConstants.IconFileName);
-                if (File.Exists(parentIcon)) form.Icon = new System.Drawing.Icon(parentIcon);
+                try
+                {
+                    var exePath = Environment.ProcessPath ?? Application.ExecutablePath;
+                    if (!string.IsNullOrEmpty(exePath) && File.Exists(exePath))
+                    {
+                        appIcon = Icon.ExtractAssociatedIcon(exePath);
+                    }
+                }
+                catch { }
             }
+
+            if (appIcon == null)
+            {
+                var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConstants.IconFileName);
+                if (File.Exists(iconPath))
+                {
+                    appIcon = new Icon(iconPath);
+                }
+                else
+                {
+                    var parentIcon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", AppConstants.IconFileName);
+                    if (File.Exists(parentIcon)) appIcon = new Icon(parentIcon);
+                }
+            }
+
+            if (appIcon != null)
+            {
+                form.Icon = appIcon;
+            }
+
+            form.HandleCreated += (s, e) =>
+            {
+                if (appIcon != null)
+                {
+                    try
+                    {
+                        SendMessage(form.Handle, WM_SETICON, ICON_SMALL, appIcon.Handle);
+                        SendMessage(form.Handle, WM_SETICON, ICON_BIG, appIcon.Handle);
+                    }
+                    catch { }
+                }
+            };
 
             // Hardware and memory optimization flags for WebView2 Chromium runtime
             Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", AppConstants.BrowserArguments);

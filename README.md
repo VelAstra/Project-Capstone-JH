@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.2"><img src="https://img.shields.io/badge/Release-v1.2.2-10B981?style=for-the-badge&logo=github" alt="Release v1.2.2"></a>
+  <a href="https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.3"><img src="https://img.shields.io/badge/Release-v1.2.3-10B981?style=for-the-badge&logo=github" alt="Release v1.2.3"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-34D399?style=for-the-badge" alt="License GPL-3.0"></a>
   <img src="https://img.shields.io/badge/Offline-100%25%20Client--Side-059669?style=for-the-badge" alt="100% Offline">
   <img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-064E3B?style=for-the-badge" alt="Multiplatform">
@@ -27,15 +27,15 @@
 
 ## 📥 Unduh Installer Aplikasi Langsung (Siap Pakai Tanpa CLI)
 
-Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh berkas yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.2.2](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.2):
+Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh berkas yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.2.3](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.3):
 
 | Platform | Format Berkas | Ukuran | Arsitektur Runtime | Tautan Unduhan Langsung |
 | :--- | :--- | :--- | :--- | :--- |
-| 🪟 **Windows** | `.exe` (Single File) | **~3.04 MB** | Native Microsoft Edge WebView2 (.NET) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Windows-x64.exe) |
-| 🍎 **macOS** | `.dmg` | **~5.87 MB** | Tauri v2 + Apple WKWebView | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-macOS.dmg) |
-| 📱 **Android** | `.apk` | **~5.43 MB** | Android System WebView (Capacitor) | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Android.apk) |
-| 🐧 **Linux** | `.AppImage` | **~79.38 MB** | Tauri v2 + WebKitGTK 4.1 | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Linux.AppImage) |
-| 📄 **Dokumentasi** | `.pdf` (LaTeX) | **~0.19 MB** | Laporan Rekayasa & Arsitektur IEEE | [Unduh OmniPDF-Studio-Technical-Report.pdf](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Technical-Report.pdf) |
+| 🪟 **Windows** | `.exe` (Single File) | **~3.04 MB** | Native Microsoft Edge WebView2 (.NET) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.3/OmniPDF-Studio-Windows-x64.exe) |
+| 🍎 **macOS** | `.dmg` | **~5.87 MB** | Tauri v2 + Apple WKWebView | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.3/OmniPDF-Studio-macOS.dmg) |
+| 📱 **Android** | `.apk` | **~5.94 MB** | Android System WebView (Capacitor) | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.3/OmniPDF-Studio-Android.apk) |
+| 🐧 **Linux** | `.AppImage` | **~79.38 MB** | Tauri v2 + WebKitGTK 4.1 | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.3/OmniPDF-Studio-Linux.AppImage) |
+| 📄 **Dokumentasi** | `.pdf` (LaTeX) | **~0.19 MB** | Laporan Rekayasa & Arsitektur IEEE | [Unduh OmniPDF-Studio-Technical-Report.pdf](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.3/OmniPDF-Studio-Technical-Report.pdf) |
 
 ---
 

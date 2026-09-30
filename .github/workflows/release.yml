@@ -206,8 +206,8 @@ jobs:
       - name: Publish Clean GitHub Release with 4 Binaries and Technical Report
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.0' }}
-          name: "OmniPDF Studio ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.0' }} - Official Multiplatform Release"
+          tag_name: ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.3' }}
+          name: "OmniPDF Studio ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.2.3' }} - Official Multiplatform Release"
           draft: false
           prerelease: false
           generate_release_notes: false
