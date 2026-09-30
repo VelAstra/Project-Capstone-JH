@@ -1,13 +1,23 @@
-# Dependencies
+# ==============================================================================
+# OmniPDF Studio - Comprehensive .gitignore
+# Multiplatform: Web, Electron (Desktop), .NET WebView2 (Host), Android (Capacitor)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Package Managers & Dependencies
+# ------------------------------------------------------------------------------
 node_modules/
 .pnpm-store/
+.npm/
+.yarn/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Binaries & Release Executables
-*.exe
-*.apk
-*.AppImage
-*.dmg
-*.deb
+# ------------------------------------------------------------------------------
+# 2. Build Outputs, Installers & Binaries
+# ------------------------------------------------------------------------------
 dist/
 dist-web/
 build-dist/
@@ -15,29 +25,104 @@ dist-win/
 dist-win-single/
 release/
 all-releases/
+out/
+
+# Standalone binary formats (distributed via GitHub Releases)
+*.exe
+*.apk
+*.aab
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.msi
+*.zip
+*.tar.gz
+
+# ------------------------------------------------------------------------------
+# 3. .NET 10 / C# Standalone Host
+# ------------------------------------------------------------------------------
 bin/
 obj/
 host/bin/
 host/obj/
 host/bundle.zip
+*.user
+*.suo
+*.userprefs
+*.pdb
+*.VisualState.xml
 *.WebView2/
+WebView2Loader.dll
 
-# Android build cache (preserve android project source)
+# ------------------------------------------------------------------------------
+# 4. Android, Capacitor & Gradle
+# ------------------------------------------------------------------------------
 android/.gradle/
-android/app/build/
 android/build/
+android/app/build/
 android/local.properties
 android/.idea/
 android/*.iml
+android/app/*.iml
+android/capacitor-cordova-android-plugins/
+android/app/src/main/assets/public/
 
-# Environment & Logs
+# Android Signing & Keystores (Strictly keep credentials private)
+*.jks
+*.keystore
+*.key
+google-services.json
+
+# ------------------------------------------------------------------------------
+# 5. Environment & Secrets
+# ------------------------------------------------------------------------------
 .env
 .env.local
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+.env.*.local
+*.pem
 
-# System
-.DS_Store
+# ------------------------------------------------------------------------------
+# 6. Operating System Artifacts
+# ------------------------------------------------------------------------------
+# Windows
 Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+
+# ------------------------------------------------------------------------------
+# 7. IDE & Editor Configurations
+# ------------------------------------------------------------------------------
+.idea/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# ------------------------------------------------------------------------------
+# 8. Scratch Scripts & Temporary Render Artifacts
+# ------------------------------------------------------------------------------
+test.png
+test_*.png
+preview*.png
+thumb_*.png
+test_*.svg
+test.svg
+scratch/

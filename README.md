@@ -1,54 +1,84 @@
-# Project-Capstone-JH: OmniPDF Studio
+# OmniPDF Studio
 
-> **Project Capstone** dibawah bimbingan **Bapak Janoe Hendarto**  
-> Aplikasi Manipulasi PDF Multiplatform Lokal & 100% Offline (Windows, Linux, macOS, dan Android).  
-> **100% Client-Side, Tanpa Server, Privasi Dokumen Terjamin Sepenuhnya.**
+<p align="center">
+  <img src="icon.svg" alt="OmniPDF Studio Official Logo" width="128" height="128">
+</p>
+
+<p align="center">
+  <strong>100% Client-Side, Multiplatform Offline PDF Manipulation Suite</strong><br>
+  <em>Aman, Cepat, Tanpa Server, dan Privasi Dokumen Terjamin Sepenuhnya.</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/Release-v1.0.0-10B981?style=for-the-badge&logo=github" alt="Release v1.0.0"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-34D399?style=for-the-badge" alt="License GPL-3.0"></a>
+  <img src="https://img.shields.io/badge/Offline-100%25%20Client--Side-059669?style=for-the-badge" alt="100% Offline">
+  <img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-064E3B?style=for-the-badge" alt="Multiplatform">
+</p>
 
 ---
 
-## 📥 Unduh Installer Aplikasi (Tinggal Klik Tanpa CLI)
+## 📌 Ringkasan Proyek
 
-Pengguna tidak perlu menjalankan terminal atau instalasi rumit. Cukup unduh satu berkas installer sesuai sistem operasi Anda di [GitHub Releases v1.0.0](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.0.0):
+> **Project Capstone** dibawah bimbingan **Bapak Janoe Hendarto**.  
+> **OmniPDF Studio** adalah aplikasi manipulasi dan pengolahan dokumen PDF multiplatform (Windows, macOS, Linux, dan Android) yang beroperasi **100% secara offline** di sisi klien (*client-side*). Seluruh proses komputasi, enkripsi, rendering, dan konversi dokumen berjalan langsung di perangkat pengguna tanpa transmisi data ke server eksternal mana pun.
+
+---
+
+## 📥 Unduh Installer Aplikasi Langsung (Siap Pakai Tanpa CLI)
+
+Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh satu berkas installer yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.0.0](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.0.0):
 
 | Platform | Format Berkas | Tautan Unduhan Langsung | Keterangan |
 | :--- | :--- | :--- | :--- |
-| 🪟 **Windows** | `.exe` (Full Installer) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows-x64.exe) | Installer lengkap Electron (NSIS & Portable). |
-| 🪟 **Windows (Lite)** | `.exe` (Single File) | [Unduh OmniPDF-Studio-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows.exe) | Standalone WebView2 Executable (3.1 MB), tinggal klik 2x langsung jalan tanpa install. |
-| 📱 **Android** | `.apk` | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Android.apk) | Berkas paket Android mandiri, langsung install di HP/Tablet. |
-| 🐧 **Linux** | `.AppImage` | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Linux.AppImage) | Format universal Linux portable, cukup beri izin eksekusi (`chmod +x`). |
-| 🍎 **macOS** | `.dmg` | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-macOS.dmg) | Disk image resmi untuk Intel & Apple Silicon (M1/M2/M3/M4). |
+| 🪟 **Windows** | `.exe` (Full Setup) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows-x64.exe) | Installer lengkap Electron (NSIS). Dilengkapi fitur *clean uninstall*. |
+| 🪟 **Windows (Lite)** | `.exe` (Single File) | [Unduh OmniPDF-Studio-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows.exe) | Standalone WebView2 Executable (~3 MB). Klik 2x langsung berjalan tanpa install. |
+| 📱 **Android** | `.apk` | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Android.apk) | Berkas paket Android mandiri, siap pasang di smartphone dan tablet. |
+| 🐧 **Linux** | `.AppImage` | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Linux.AppImage) | Format universal Linux portable. Cukup aktifkan izin eksekusi (`chmod +x`). |
+| 🍎 **macOS** | `.dmg` | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-macOS.dmg) | Disk image universal untuk arsitektur Intel & Apple Silicon (M1/M2/M3/M4). |
 
 ---
 
-## 🌐 1. Daftar Lengkap 26+ Fitur Manipulasi PDF
+## 🛠️ Daftar Lengkap 26+ Fitur Manipulasi PDF
 
-OmniPDF Studio menyediakan rangkaian fitur manipulasi PDF terlengkap yang berjalan secara mandiri (*client-side*):
+OmniPDF Studio menyediakan rangkaian alat pengolahan PDF komprehensif yang terbagi ke dalam 7 kategori utama:
+
+```
+OmniPDF Studio
+ ├── 📄 Manipulasi Halaman (Merge, Split, Organize, Rotate, Remove, Extract)
+ ├── ✍️ Edit & Anotasi (Drawing Canvas, Digital Signature, Watermark, Page Numbers, Flatten)
+ ├── 🔄 Konversi dari PDF (PDF to JPG, PDF to Text, Extract Images, Offline OCR)
+ ├── 📥 Konversi ke PDF (PPTX to PDF, Image to PDF, HTML to PDF)
+ ├── 🔒 Keamanan & Optimasi (AES Protect, Password Unlock, Compress, Metadata Editor)
+ ├── 📐 Tata Letak & Cetak (N-Up Multi-Page, Margin Cropping, Page Resizing)
+ └── 🤖 Kecerdasan Dokumen (AI Summarizer, Multi-Language Translator)
+```
 
 ### 📄 A. Manipulasi Halaman (Manipulate PDF)
-1. **Merge PDF**: Menggabungkan banyak file PDF menjadi satu berkas secara berurutan. Mendukung pemilihan file dalam jumlah tak terbatas.
-2. **Split PDF**: Memisahkan dokumen berdasarkan rentang halaman tertentu (misal: `1-3, 5, 8-10`) atau memecah per lembar.
-3. **Organize PDF**: Mengatur urutan halaman secara visual dengan sistem *drag and drop thumbnail*, membalik susunan, atau menghapus halaman tertentu.
-4. **Rotate PDF**: Memutar orientasi halaman (90°, 180°, 270°) untuk satu halaman spesifik atau sekaligus seluruh dokumen.
-5. **Remove Pages**: Menghapus halaman-halaman yang tidak diinginkan dengan memilih kartu preview halaman.
-6. **Extract Pages**: Mengambil halaman-halaman tertentu dan menyimpannya menjadi dokumen PDF baru.
+1. **Merge PDF**: Menggabungkan banyak dokumen PDF menjadi satu berkas secara berurutan dengan opsi penataan dinamis.
+2. **Split PDF**: Memisahkan dokumen berdasarkan rentang halaman kustom (misal: `1-3, 5, 8-10`) atau memecah per lembar.
+3. **Organize PDF**: Mengatur urutan halaman secara interaktif melalui kartu thumbnail *drag-and-drop*, membalik urutan, atau menghapus halaman tertentu.
+4. **Rotate PDF**: Memutar orientasi halaman (90°, 180°, 270°) untuk lembar tertentu maupun sekaligus seluruh dokumen.
+5. **Remove Pages**: Menghapus satu atau banyak halaman yang tidak diinginkan dengan memilih kartu preview.
+6. **Extract Pages**: Mengambil halaman-halaman spesifik dan mengekspornya menjadi berkas PDF mandiri baru.
 
-### ✍️ B. Edit & Tambah Konten (Edit & Add)
-7. **Visual PDF Editor**: Kanvas interaktif untuk menggambar bebas (*freehand pencil*), menambahkan teks kustom, garis penyorot (*highlighter*), bentuk kotak/lingkaran, serta riwayat *undo/redo*.
+### ✍️ B. Edit & Tambah Konten (Edit & Annotate)
+7. **Visual PDF Editor**: Kanvas interaktif untuk menggambar bebas (*freehand pencil*), menambahkan teks kustom, garis penyorot (*highlighter*), bentuk geometris kotak/lingkaran, serta riwayat *undo/redo*.
 8. **Sign PDF (Tanda Tangan Digital)**: Modal interaktif penoreh tanda tangan dengan *Signature Pad*, dapat diatur ukuran, warna goresan, posisi peletakan, dan dibubuhkan langsung ke lembaran PDF.
-9. **Watermark (Tanda Air)**: Membubuhkan cap teks identitas kepemilikan/rahasia dengan opsi transparansi (*opacity*), ukuran huruf, sudut rotasi, dan warna.
-10. **Page Numbers**: Menambahkan nomor halaman otomatis (`Halaman n dari total`) dengan pilihan posisi (bawah-tengah, bawah-kanan, atas).
-11. **Flatten PDF**: Meratakan formulir interaktif dan anotasi menjadi konten statis agar tidak dapat diubah lagi.
+9. **Watermark (Tanda Air)**: Membubuhkan cap teks kepemilikan/kerahasiaan dengan opsi transparansi (*opacity*), ukuran huruf, rotasi, dan palet warna.
+10. **Page Numbers**: Menambahkan nomor halaman otomatis (`Halaman n dari total`) dengan beragam opsi perataan (bawah-tengah, bawah-kanan, atas).
+11. **Flatten PDF**: Meratakan formulir interaktif dan anotasi menjadi konten statis permanen yang tidak dapat diubah kembali.
 
 ### 🔄 C. Konversi dari PDF (Convert from PDF)
 12. **PDF to JPG**: Merender setiap halaman PDF menjadi berkas gambar JPG beresolusi tinggi dengan opsi unduh massal format ZIP.
-13. **PDF to Text**: Mengekstrak seluruh teks dari dokumen PDF ke dalam berkas teks (.txt).
-14. **Extract Images**: Mendeteksi dan mengekstrak semua elemen gambar tersemat di dalam file PDF.
+13. **PDF to Text**: Mengekstrak seluruh teks dari dokumen PDF ke dalam berkas teks murni (.txt).
+14. **Extract Images**: Mendeteksi dan mengekstrak semua elemen gambar tersemat di dalam file PDF ke berkas gambar terpisah.
 15. **OCR PDF (Optical Character Recognition)**: Mengenali teks pada lembaran hasil scan fisik menggunakan engine Tesseract.js offline.
 
 ### 📥 D. Konversi ke PDF (Convert to PDF)
 16. **PPT to PDF**: Mengonversi presentasi PowerPoint (.pptx) menjadi format cetak dokumen PDF.
 17. **JPG to PDF**: Menggabungkan banyak gambar foto/scan (JPG, PNG) menjadi satu berkas PDF dengan opsi orientasi dan margin.
-18. **HTML to PDF**: Merender dokumen berbasis markup HTML menjadi lembaran PDF.
+18. **HTML to PDF**: Merender dokumen berbasis markup HTML menjadi lembaran PDF cetak.
 
 ### 🔒 E. Keamanan & Optimasi (Security & Optimize)
 19. **Compress PDF**: Merampingkan ukuran byte dokumen dengan mengompresi gambar dan merestrukturisasi alur objek stream.
@@ -62,38 +92,93 @@ OmniPDF Studio menyediakan rangkaian fitur manipulasi PDF terlengkap yang berjal
 25. **Change Page Size**: Mengubah ukuran standar lembaran PDF (A4, US Letter, Legal, Tabloid).
 
 ### 🤖 G. Kecerdasan Dokumen (Intelligence)
-26. **AI Summarizer & Translate**: Analisis rangkuman poin-poin penting isi dokumen dan penerjemahan teks.
+26. **AI Summarizer & Translate**: Analisis rangkuman poin-poin penting isi dokumen dan penerjemahan teks multi-bahasa.
 
 ---
 
-## 🎨 2. Desain Flat Murni & Palet Warna Sesuai Spesifikasi
+## 🎨 Desain Antarmuka & Palet Warna Flat
 
-Aplikasi dirancang dengan tampilan **Flat Design** (bebas dari efek gradien linear/radial) untuk menghadirkan ketegasan visual yang bersih, modern, dan nyaman di mata:
+Aplikasi mengusung estetika **Flat Design** modern dengan kontras warna yang nyaman untuk penggunaan intensif:
 
 ### ☀️ Mode Terang (Light Mode)
-* **`#FBFFE4`**: Latar belakang aplikasi (*App Background*).
-* **`#3D8D7A`**: Warna primer untuk tombol aksi utama, header aksen, dan status aktif.
-* **`#B3D8A8`**: Warna aksen untuk garis batas (*borders*) kartu dan sorotan elemen.
-* **`#A3D1C6`**: Latar belakang bilah sisi (*sidebar*) dan kontainer kartu sekunder.
-* **`#092328`**: Teks utama berdaya kontras tinggi.
+* `#FBFFE4` : Latar belakang aplikasi (*App Background*)
+* `#3D8D7A` : Warna primer untuk tombol aksi utama, header aksen, dan status aktif
+* `#B3D8A8` : Warna aksen untuk garis batas (*borders*) kartu dan sorotan elemen
+* `#A3D1C6` : Latar belakang bilah sisi (*sidebar*) dan kontainer kartu sekunder
+* `#092328` : Teks utama berdaya kontras tinggi
 
 ### 🌙 Mode Gelap (Dark Mode)
-* **`#092328`**: Latar belakang aplikasi (*Deep Slate Background*).
-* **`#12544F`**: Permukaan bilah sisi (*sidebar*) dan kartu fitur (*card background*).
-* **`#2A835F`**: Warna primer tombol aksi utama dan indikator aktif.
-* **`#8BBB92`**: Warna aksen untuk teks sekunder, ikon, dan garis batas halus.
-* **`#FBFFE4`**: Teks utama kontras terang.
+* `#092328` : Latar belakang aplikasi (*Deep Slate Background*)
+* `#12544F` : Permukaan bilah sisi (*sidebar*) dan kartu fitur (*card background*)
+* `#2A835F` : Warna primer tombol aksi utama dan indikator aktif
+* `#8BBB92` : Warna aksen untuk teks sekunder, ikon, dan garis batas halus
+* `#FBFFE4` : Teks utama kontras terang
 
-> **Pengalih Tema Instan:** Tombol matahari/bulan di bagian atas (*header*) dan di bilah sisi (*sidebar*) memungkinkan peralihan instan antara tema terang dan tema gelap, tersimpan otomatis di `localStorage`.
-
----
-
-## 🛡️ 3. Jaminan Privasi 100% Offline
-
-Seluruh proses komputasi, render, konversi, dan manipulasi berkas PDF dieksekusi 100% di sisi klien (*client-side*). Berkas Anda **tidak pernah dikirim ke internet atau server pihak ketiga mana pun**.
+> **Pengalih Tema Instan:** Tombol matahari/bulan di bagian atas (*header*) dan di bilah sisi (*sidebar*) memungkinkan peralihan instan antara tema terang dan gelap, tersimpan otomatis di `localStorage`.
 
 ---
 
-## 📜 4. Lisensi
+## 💻 Arsitektur & Teknologi
 
-Proyek ini dilisensikan di bawah lisensi terbuka [GNU General Public License v3.0 (GPL-3.0)](file:///C:/Users/Rayhan/Documents/GitHub/Project-Capstone-JH/LICENSE).
+* **Frontend**: HTML5, Modern CSS3 (Grid & Flexbox), Vanilla JavaScript (ES2022).
+* **PDF Engines**:
+  * [PDF-Lib](https://pdf-lib.js.org/) untuk manipulasi struktur, modifikasi halaman, dan enkripsi.
+  * [PDF.js](https://mozilla.github.io/pdf.js/) dari Mozilla untuk perenderan halaman dan ekstraksi kanvas.
+  * [Tesseract.js](https://tesseract.projectnaptha.com/) untuk pengenalan karakter optik (OCR) offline.
+  * [Signature Pad](https://github.com/szimek/signature_pad) untuk pembuatan tanda tangan digital berbasis vektor.
+  * [JSZip](https://stuk.github.io/jszip/) untuk pengemasan unduhan arsip batch.
+* **Desktop Wrappers**:
+  * [Electron](https://www.electronjs.org/) untuk build installer cross-platform (Windows NSIS, Linux AppImage, macOS DMG).
+  * [.NET 10 Windows Forms Host](https://dotnet.microsoft.com/) dengan WebView2 tersemat untuk installer Windows Lite super ringan (~3 MB).
+* **Mobile Shell**:
+  * [Capacitor Android](https://capacitorjs.com/) untuk build paket mandiri Android (.apk).
+
+---
+
+## 🚀 Panduan Pengembangan Lokal (Developer Setup)
+
+### Prasyarat
+* [Node.js](https://nodejs.org/) versi 18 atau lebih baru.
+* [.NET 10 SDK](https://dotnet.microsoft.com/download) (hanya jika ingin mengompilasi Windows Lite Host).
+
+### Langkah-Langkah
+
+1. **Clone Repository**:
+   ```bash
+   git clone https://github.com/VelAstra/Project-Capstone-JH.git
+   cd Project-Capstone-JH
+   ```
+
+2. **Instal Dependensi**:
+   ```bash
+   npm install
+   ```
+
+3. **Jalankan Aplikasi Desktop (Electron)**:
+   ```bash
+   npm start
+   ```
+
+4. **Jalankan Uji Otomatis**:
+   ```bash
+   npm test
+   ```
+
+5. **Kompilasi Standalone Windows Host (.NET 10 Lite)**:
+   ```bash
+   cd host
+   dotnet publish -c Release -r win-x64 --no-self-contained
+   ```
+
+---
+
+## 🧹 Jaminan Uninstalasi Bersih (Clean Uninstall)
+
+Pada penginstal Windows (NSIS), skrip [build/installer.nsh](build/installer.nsh) dikonfigurasikan dengan `deleteAppDataOnUninstall: true` dan pembersihan registry otomatis. Ketika pengguna menghapus instalasi (*uninstall*), seluruh data cache, konfigurasi lokal di `%LocalAppData%\omnipdf-studio` dan `%AppData%\OmniPDF Studio` akan dihapus bersih tanpa meninggalkan sampah di sistem operasi.
+
+---
+
+## 📜 Lisensi & Atribusi
+
+* **Bimbingan Proyek**: Bapak Janoe Hendarto
+* **Lisensi**: Proyek ini dilisensikan di bawah lisensi terbuka [GNU General Public License v3.0 (GPL-3.0)](LICENSE).
