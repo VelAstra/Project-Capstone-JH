@@ -1,5 +1,5 @@
 {
-  "appId": "com.velastra.omnipdf",
+  "appId": "com.velastra.omnipdfstudio",
   "appName": "OmniPDF Studio",
   "webDir": "dist",
   "bundledWebRuntime": false,

@@ -1,4 +1,4 @@
-package com.antigravity.pdfsuitepro;
+package com.velastra.omnipdfstudio;
 
 import com.getcapacitor.BridgeActivity;
 

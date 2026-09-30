@@ -1,4 +1,4 @@
-/* Visual Signature Drawer and Placement Component - PDF Suite Pro */
+/* Visual Signature Drawer and Placement Component - OmniPDF Studio */
 
 let signaturePad = null;
 let currentSignatureImage = null; // DataURL of signature

@@ -1,4 +1,4 @@
-/* Core PDF Processing Functions - PDF Suite Pro */
+/* Core PDF Processing Functions - OmniPDF Studio */
 
 // Ensure pdf.js worker is configured
 if (window.pdfjsLib) {

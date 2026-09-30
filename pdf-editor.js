@@ -1,4 +1,4 @@
-/* Interactive PDF Editor Module - PDF Suite Pro */
+/* Interactive PDF Editor Module - OmniPDF Studio */
 
 let activeElements = []; // { id, pageIndex, type, x, y, width, height, text, color, fontSize, dataUrl }
 let selectedElementId = null;

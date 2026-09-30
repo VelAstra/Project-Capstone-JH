@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.antigravity.pdfsuitepro"
+    namespace = "com.velastra.omnipdfstudio"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.antigravity.pdfsuitepro"
+        applicationId "com.velastra.omnipdfstudio"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

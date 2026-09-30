@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">PDF Suite Pro</string>
-    <string name="title_activity_main">PDF Suite Pro</string>
-    <string name="package_name">com.antigravity.pdfsuitepro</string>
-    <string name="custom_url_scheme">com.antigravity.pdfsuitepro</string>
+    <string name="app_name">OmniPDF Studio</string>
+    <string name="title_activity_main">OmniPDF Studio</string>
+    <string name="package_name">com.velastra.omnipdfstudio</string>
+    <string name="custom_url_scheme">com.velastra.omnipdfstudio</string>
 </resources>
