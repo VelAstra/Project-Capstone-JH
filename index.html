@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OmniPDF Studio - Aplikasi Manipulasi PDF Offline</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233D8D7A'><path d='M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/></svg>">
+</head>
+<body>
+  <div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">P</div>
+        <div>
+          <div class="brand-title">OmniPDF Studio</div>
+          <div class="brand-subtitle">100% Lokal & Offline</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <!-- Rendered dynamically by app.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="badge-offline">
+          <span class="status-dot"></span>
+          <span>Offline & Aman (Privasi 100%)</span>
+        </div>
+        <button id="sidebar-theme-btn" class="btn-theme-toggle" style="width: 100%; justify-content: center;">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-label">Mode Gelap</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Buka Menu">☰</button>
+          <div class="topbar-title" id="page-title">Beranda</div>
+        </div>
+        <div class="topbar-right">
+          <!-- THEME TOGGLE BUTTON -->
+          <button id="home-theme-btn" class="btn-theme-toggle" title="Ubah Tema Tampilan">
+            <span class="theme-icon">🌙</span>
+            <span class="theme-label">Ubah Tema</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <main class="content-body" id="main-content">
+        <!-- Content will be swapped between Home and Active Tool by app.js -->
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

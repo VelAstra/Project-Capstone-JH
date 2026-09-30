@@ -1,16 +1,40 @@
 {
-  "name": "aeromark",
+  "name": "omnipdf-studio",
   "version": "1.0.0",
-  "description": "AeroMark - Modern Markdown Editor & Reader (Capstone Project)",
-  "main": "electron-main.cjs",
+  "description": "Aplikasi Manipulasi PDF Offline Multiplatform (Windows, Linux, macOS, Android) - Capstone Project",
+  "main": "electron/main.cjs",
+  "type": "module",
   "scripts": {
-    "pack:linux": "electron-builder --linux AppImage",
-    "pack:mac": "electron-builder --mac dmg"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node test/pdf-engine.test.mjs",
+    "electron:dev": "vite build && electron .",
+    "electron:build": "vite build && electron-builder",
+    "cap:build": "vite build && npx cap sync android"
   },
-  "author": "VelAstra",
-  "license": "GPL-3.0",
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "jszip": "^3.10.1"
+  },
   "devDependencies": {
-    "electron": "^33.2.0",
-    "electron-builder": "^25.1.8"
-  }
+    "vite": "^6.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VelAstra/Project-Capstone-JH.git"
+  },
+  "keywords": [
+    "pdf",
+    "pdf-tools",
+    "offline-pdf",
+    "multiplatform",
+    "windows",
+    "linux",
+    "macos",
+    "android",
+    "capstone"
+  ],
+  "author": "VelAstra",
+  "license": "GPL-3.0"
 }
