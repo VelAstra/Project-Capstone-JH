@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/Release-v1.0.0-10B981?style=for-the-badge&logo=github" alt="Release v1.0.0"></a>
+  <a href="https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.2"><img src="https://img.shields.io/badge/Release-v1.2.2-10B981?style=for-the-badge&logo=github" alt="Release v1.2.2"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-34D399?style=for-the-badge" alt="License GPL-3.0"></a>
   <img src="https://img.shields.io/badge/Offline-100%25%20Client--Side-059669?style=for-the-badge" alt="100% Offline">
   <img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-064E3B?style=for-the-badge" alt="Multiplatform">
@@ -27,15 +27,15 @@
 
 ## 📥 Unduh Installer Aplikasi Langsung (Siap Pakai Tanpa CLI)
 
-Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh satu berkas installer yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.0.0](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.0.0):
+Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh berkas yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.2.2](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.2):
 
-| Platform | Format Berkas | Tautan Unduhan Langsung | Keterangan |
-| :--- | :--- | :--- | :--- |
-| 🪟 **Windows** | `.exe` (Full Setup) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows-x64.exe) | Installer lengkap Electron (NSIS). Dilengkapi fitur *clean uninstall*. |
-| 🪟 **Windows (Lite)** | `.exe` (Single File) | [Unduh OmniPDF-Studio-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows.exe) | Standalone WebView2 Executable (~3 MB). Klik 2x langsung berjalan tanpa install. |
-| 📱 **Android** | `.apk` | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Android.apk) | Berkas paket Android mandiri, siap pasang di smartphone dan tablet. |
-| 🐧 **Linux** | `.AppImage` | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Linux.AppImage) | Format universal Linux portable. Cukup aktifkan izin eksekusi (`chmod +x`). |
-| 🍎 **macOS** | `.dmg` | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-macOS.dmg) | Disk image universal untuk arsitektur Intel & Apple Silicon (M1/M2/M3/M4). |
+| Platform | Format Berkas | Ukuran | Arsitektur Runtime | Tautan Unduhan Langsung |
+| :--- | :--- | :--- | :--- | :--- |
+| 🪟 **Windows** | `.exe` (Single File) | **~3.04 MB** | Native Microsoft Edge WebView2 (.NET) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Windows-x64.exe) |
+| 🍎 **macOS** | `.dmg` | **~5.87 MB** | Tauri v2 + Apple WKWebView | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-macOS.dmg) |
+| 📱 **Android** | `.apk` | **~5.43 MB** | Android System WebView (Capacitor) | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Android.apk) |
+| 🐧 **Linux** | `.AppImage` | **~79.38 MB** | Tauri v2 + WebKitGTK 4.1 | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Linux.AppImage) |
+| 📄 **Dokumentasi** | `.pdf` (LaTeX) | **~0.19 MB** | Laporan Rekayasa & Arsitektur IEEE | [Unduh OmniPDF-Studio-Technical-Report.pdf](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.2/OmniPDF-Studio-Technical-Report.pdf) |
 
 ---
 
@@ -127,11 +127,12 @@ Aplikasi mengusung estetika **Flat Design** modern dengan kontras warna yang nya
   * [Tesseract.js](https://tesseract.projectnaptha.com/) untuk pengenalan karakter optik (OCR) offline.
   * [Signature Pad](https://github.com/szimek/signature_pad) untuk pembuatan tanda tangan digital berbasis vektor.
   * [JSZip](https://stuk.github.io/jszip/) untuk pengemasan unduhan arsip batch.
-* **Desktop Wrappers**:
-  * [Electron](https://www.electronjs.org/) untuk build installer cross-platform (Windows NSIS, Linux AppImage, macOS DMG).
-  * [.NET 10 Windows Forms Host](https://dotnet.microsoft.com/) dengan WebView2 tersemat untuk installer Windows Lite super ringan (~3 MB).
+* **Desktop Wrappers & Native WebView Hosts**:
+  * **Windows**: [.NET 10 Windows Forms Host](https://dotnet.microsoft.com/) dengan runtime bawaan Microsoft Edge WebView2 (~3.04 MB single-file standalone executable).
+  * **macOS**: [Tauri v2](https://tauri.app/) dengan core Rust dan Apple WKWebView (~5.87 MB DMG).
+  * **Linux**: [Tauri v2](https://tauri.app/) dengan WebKitGTK 4.1 (~79.38 MB universal AppImage).
 * **Mobile Shell**:
-  * [Capacitor Android](https://capacitorjs.com/) untuk build paket mandiri Android (.apk).
+  * [Capacitor Android](https://capacitorjs.com/) dengan Android System WebView (~5.43 MB APK).
 
 ---
 
@@ -139,7 +140,8 @@ Aplikasi mengusung estetika **Flat Design** modern dengan kontras warna yang nya
 
 ### Prasyarat
 * [Node.js](https://nodejs.org/) versi 18 atau lebih baru.
-* [.NET 10 SDK](https://dotnet.microsoft.com/download) (hanya jika ingin mengompilasi Windows Lite Host).
+* [Rust & Cargo](https://rustup.rs/) (untuk membangun versi macOS/Linux melalui Tauri v2).
+* [.NET 10 SDK](https://dotnet.microsoft.com/download) (untuk mengompilasi Windows Native Host).
 
 ### Langkah-Langkah
 
@@ -149,32 +151,26 @@ Aplikasi mengusung estetika **Flat Design** modern dengan kontras warna yang nya
    cd Project-Capstone-JH
    ```
 
-2. **Instal Dependensi**:
+2. **Instal Dependensi & Siapkan Web Assets**:
    ```bash
    npm install
+   npm run prepare:dist
    ```
 
-3. **Jalankan Aplikasi Desktop (Electron)**:
-   ```bash
-   npm start
-   ```
-
-4. **Jalankan Uji Otomatis**:
+3. **Jalankan Uji Otomatis**:
    ```bash
    npm test
    ```
 
-5. **Kompilasi Standalone Windows Host (.NET 10 Lite)**:
+4. **Kompilasi Standalone Windows Host (.NET 10 Lite ~3 MB)**:
    ```bash
-   cd host
-   dotnet publish -c Release -r win-x64 --no-self-contained
+   dotnet publish host/OmniPdfStudio.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --output host-publish
    ```
 
----
-
-## 🧹 Jaminan Uninstalasi Bersih (Clean Uninstall)
-
-Pada penginstal Windows (NSIS), skrip [build/installer.nsh](build/installer.nsh) dikonfigurasikan dengan `deleteAppDataOnUninstall: true` dan pembersihan registry otomatis. Ketika pengguna menghapus instalasi (*uninstall*), seluruh data cache, konfigurasi lokal di `%LocalAppData%\omnipdf-studio` dan `%AppData%\OmniPDF Studio` akan dihapus bersih tanpa meninggalkan sampah di sistem operasi.
+5. **Kompilasi Desktop via Tauri v2**:
+   ```bash
+   npm run build:tauri
+   ```
 
 ---
 

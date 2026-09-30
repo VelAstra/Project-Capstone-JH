@@ -3,72 +3,11 @@
   "productName": "OmniPDF Studio",
   "version": "1.2.2",
   "description": "100% Client-Side Offline Multiplatform PDF Suite (Windows, Linux, macOS, Android)",
-  "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "node -e \"console.log('OmniPDF Studio tests passed: 26+ tools loaded'); process.exit(0);\"",
-    "build": "electron-builder --win --x64",
-    "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux AppImage",
-    "build:mac": "electron-builder --mac dmg",
-    "build:all": "electron-builder -mwl"
-  },
-  "build": {
-    "appId": "com.velastra.omnipdfstudio",
-    "productName": "OmniPDF Studio",
-    "directories": {
-      "output": "release"
-    },
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
-      "icon": "icon.ico",
-      "artifactName": "OmniPDF-Studio-Windows-${arch}.${ext}"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "perMachine": false,
-      "deleteAppDataOnUninstall": true,
-      "uninstallDisplayName": "OmniPDF Studio",
-      "createDesktopShortcut": "always",
-      "createStartMenuShortcut": true,
-      "include": "build/installer.nsh"
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ],
-      "icon": "icon.png",
-      "category": "Office",
-      "artifactName": "OmniPDF-Studio-Linux.${ext}"
-    },
-    "mac": {
-      "target": [
-        "dmg"
-      ],
-      "icon": "icon.png",
-      "category": "public.app-category.productivity",
-      "artifactName": "OmniPDF-Studio-macOS.${ext}"
-    },
-    "files": [
-      "index.html",
-      "style.css",
-      "app.js",
-      "pdf-tools.js",
-      "signature-pad-modal.js",
-      "pdf-editor.js",
-      "annotate.js",
-      "main.js",
-      "preload.js",
-      "package.json",
-      "assets/**/*",
-      "icon.png",
-      "icon.ico",
-      "icon.svg"
-    ]
+    "prepare:dist": "node scripts/prepare-dist.js",
+    "build:tauri": "tauri build",
+    "dev:tauri": "tauri dev",
+    "test": "node -e \"console.log('OmniPDF Studio tests passed: 26+ tools loaded'); process.exit(0);\""
   },
   "keywords": [
     "pdf",
@@ -88,13 +27,10 @@
   "author": "VelAstra",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@tauri-apps/cli": "^2.12.0",
-    "electron": "^34.0.0",
-    "electron-builder": "^26.15.2"
+    "@tauri-apps/cli": "^2.12.0"
   },
   "dependencies": {
     "jszip": "^3.10.1",
-    "pdf-lib": "^1.17.1",
-    "pptx-to-pdf": "^0.1.3"
+    "pdf-lib": "^1.17.1"
   }
 }
