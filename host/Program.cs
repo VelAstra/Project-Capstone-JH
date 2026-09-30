@@ -34,6 +34,10 @@ namespace OmniPdfStudio
                 if (File.Exists(parentIcon)) form.Icon = new System.Drawing.Icon(parentIcon);
             }
 
+            // Hardware and memory optimization flags for WebView2 Chromium runtime
+            Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
+                "--js-flags=\"--max-old-space-size=256 --optimize-for-size\" --disable-features=Autofill,Translate,MediaRouter,OptimizationHints --disk-cache-size=16777216 --disable-component-update --disable-sync");
+
             var webView = new WebView2
             {
                 Dock = DockStyle.Fill
@@ -41,10 +45,30 @@ namespace OmniPdfStudio
 
             form.Controls.Add(webView);
 
+            // Dynamically manage memory when minimized/restored
+            form.Resize += (s, e) =>
+            {
+                try
+                {
+                    if (webView?.CoreWebView2 != null)
+                    {
+                        if (form.WindowState == FormWindowState.Minimized)
+                        {
+                            webView.CoreWebView2.MemoryUsageTargetLevel = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Low;
+                        }
+                        else
+                        {
+                            webView.CoreWebView2.MemoryUsageTargetLevel = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Normal;
+                        }
+                    }
+                }
+                catch { }
+            };
+
             form.Load += async (s, e) =>
             {
                 await webView.EnsureCoreWebView2Async();
-                webView.CoreWebView2.Settings.AreDevToolsEnabled = true;
+                webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
 
                 // 1. Check local directory or parent directory
                 var indexPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "index.html"));

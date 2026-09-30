@@ -2,6 +2,18 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const pptxToPdf = require('pptx-to-pdf');
 const path = require('path');
 
+// Hardware and memory optimization flags
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=256 --optimize-for-size');
+app.commandLine.appendSwitch('disable-features', 'Autofill,Translate,MediaRouter,OptimizationHints,CalculateNativeWinOcclusion');
+app.commandLine.appendSwitch('disk-cache-size', '16777216');
+app.commandLine.appendSwitch('media-cache-size', '16777216');
+app.commandLine.appendSwitch('disable-component-update');
+app.commandLine.appendSwitch('disable-domain-reliability');
+app.commandLine.appendSwitch('disable-sync');
+app.commandLine.appendSwitch('disable-speech-api');
+app.commandLine.appendSwitch('disable-breakpad');
+app.commandLine.appendSwitch('disable-print-preview');
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
@@ -13,7 +25,10 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      spellcheck: false,
+      backgroundThrottling: true,
+      enableWebSQL: false
     }
   });
 
@@ -21,6 +36,13 @@ function createWindow() {
   
   // Hide menu bar for cleaner dashboard visual layout
   win.setMenuBarVisibility(false);
+
+  // Release memory on minimize
+  win.on('minimize', () => {
+    if (process.platform === 'win32') {
+      win.webContents.invalidate();
+    }
+  });
 }
 
 app.whenReady().then(() => {

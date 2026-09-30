@@ -561,108 +561,121 @@ async function renderOrganizeWorkspace(file) {
       renderOrganizeWorkspace(file);
     });
 
-    for (let i = 1; i <= numPages; i++) {
-      const originalIndex = i - 1;
-      pagesState.push({ originalIndex, rotation: 0 });
+    try {
+      for (let i = 1; i <= numPages; i++) {
+        const originalIndex = i - 1;
+        pagesState.push({ originalIndex, rotation: 0 });
 
-      const page = await pdfDoc.getPage(i);
-      const viewport = page.getViewport({ scale: 0.3 }); // Small thumbnails
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: 0.3 }); // Small thumbnails
 
-      const card = document.createElement('div');
-      card.className = 'page-card';
-      card.setAttribute('data-original-index', originalIndex);
-      
-      const canvasContainer = document.createElement('div');
-      canvasContainer.className = 'page-card-canvas-container';
-      
-      const canvas = document.createElement('canvas');
-      canvas.id = `page-canvas-${originalIndex}`;
-      const context = canvas.getContext('2d');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      
-      canvasContainer.appendChild(canvas);
-      card.appendChild(canvasContainer);
+        const card = document.createElement('div');
+        card.className = 'page-card';
+        card.setAttribute('data-original-index', originalIndex);
+        
+        const canvasContainer = document.createElement('div');
+        canvasContainer.className = 'page-card-canvas-container';
+        
+        const canvas = document.createElement('canvas');
+        canvas.id = `page-canvas-${originalIndex}`;
+        const context = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        
+        canvasContainer.appendChild(canvas);
+        card.appendChild(canvasContainer);
 
-      const pageLabel = document.createElement('span');
-      pageLabel.className = 'page-card-num';
-      pageLabel.textContent = `Page ${i}`;
-      card.appendChild(pageLabel);
+        const pageLabel = document.createElement('span');
+        pageLabel.className = 'page-card-num';
+        pageLabel.textContent = `Page ${i}`;
+        card.appendChild(pageLabel);
 
-      // Card selection logic
-      card.addEventListener('click', () => {
-        card.classList.toggle('selected');
-        const info = pagesState.find(p => p.originalIndex === originalIndex);
-        if (info) info.selected = !info.selected;
-      });
+        // Card selection logic
+        card.addEventListener('click', () => {
+          card.classList.toggle('selected');
+          const info = pagesState.find(p => p.originalIndex === originalIndex);
+          if (info) info.selected = !info.selected;
+        });
 
-      // Actions overlay
-      const actions = document.createElement('div');
-      actions.className = 'page-card-actions';
+        // Actions overlay
+        const actions = document.createElement('div');
+        actions.className = 'page-card-actions';
 
-      const rotateBtn = document.createElement('button');
-      rotateBtn.className = 'btn-page-action';
-      rotateBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i>';
-      rotateBtn.title = "Rotate 90° Clockwise";
-      rotateBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const info = pagesState.find(p => p.originalIndex === originalIndex);
-        info.rotation = (info.rotation + 90) % 360;
-        canvas.style.transform = `rotate(${info.rotation}deg)`;
-      });
+        const rotateBtn = document.createElement('button');
+        rotateBtn.className = 'btn-page-action';
+        rotateBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i>';
+        rotateBtn.title = "Rotate 90° Clockwise";
+        rotateBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const info = pagesState.find(p => p.originalIndex === originalIndex);
+          info.rotation = (info.rotation + 90) % 360;
+          canvas.style.transform = `rotate(${info.rotation}deg)`;
+        });
 
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'btn-page-action delete';
-      deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-      deleteBtn.title = "Delete Page";
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        card.remove();
-        pagesState = pagesState.filter(p => p.originalIndex !== originalIndex);
-        if (pagesState.length === 0) {
-          elements.btnProcess.setAttribute('disabled', 'true');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-page-action delete';
+        deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+        deleteBtn.title = "Delete Page";
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          card.remove();
+          pagesState = pagesState.filter(p => p.originalIndex !== originalIndex);
+          if (pagesState.length === 0) {
+            elements.btnProcess.setAttribute('disabled', 'true');
+          }
+        });
+
+        // Simple navigation buttons to move pages left/right in vanilla JS
+        const leftBtn = document.createElement('button');
+        leftBtn.className = 'btn-page-action';
+        leftBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i>';
+        leftBtn.title = "Move Page Left";
+        leftBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const prev = card.previousElementSibling;
+          if (prev) {
+            card.parentNode.insertBefore(card, prev);
+            reorderPageState();
+          }
+        });
+
+        const rightBtn = document.createElement('button');
+        rightBtn.className = 'btn-page-action';
+        rightBtn.innerHTML = '<i class="fa-solid fa-arrow-right"></i>';
+        rightBtn.title = "Move Page Right";
+        rightBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const next = card.nextElementSibling;
+          if (next) {
+            card.parentNode.insertBefore(next, card);
+            reorderPageState();
+          }
+        });
+
+        actions.appendChild(leftBtn);
+        actions.appendChild(rightBtn);
+        actions.appendChild(rotateBtn);
+        actions.appendChild(deleteBtn);
+        card.appendChild(actions);
+
+        elements.pagesGrid.appendChild(card);
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        page.cleanup();
+
+        // Yield to the event loop every 2 pages to keep CPU load low and UI responsive
+        if (i % 2 === 0) {
+          await new Promise(resolve => setTimeout(resolve, 0));
         }
-      });
-
-      // Simple navigation buttons to move pages left/right in vanilla JS
-      const leftBtn = document.createElement('button');
-      leftBtn.className = 'btn-page-action';
-      leftBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i>';
-      leftBtn.title = "Move Page Left";
-      leftBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const prev = card.previousElementSibling;
-        if (prev) {
-          card.parentNode.insertBefore(card, prev);
-          reorderPageState();
-        }
-      });
-
-      const rightBtn = document.createElement('button');
-      rightBtn.className = 'btn-page-action';
-      rightBtn.innerHTML = '<i class="fa-solid fa-arrow-right"></i>';
-      rightBtn.title = "Move Page Right";
-      rightBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const next = card.nextElementSibling;
-        if (next) {
-          card.parentNode.insertBefore(next, card);
-          reorderPageState();
-        }
-      });
-
-      actions.appendChild(leftBtn);
-      actions.appendChild(rightBtn);
-      actions.appendChild(rotateBtn);
-      actions.appendChild(deleteBtn);
-      card.appendChild(actions);
-
-      elements.pagesGrid.appendChild(card);
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      }
+      
+      // Enable the process button once rendering is complete
+      elements.btnProcess.removeAttribute('disabled');
+    } finally {
+      try {
+        await pdfDoc.cleanup();
+        await pdfDoc.destroy();
+      } catch { }
     }
-    
-    // Enable the process button once rendering is complete
-    elements.btnProcess.removeAttribute('disabled');
   } catch (error) {
     console.error("Rendering pages failed", error);
     elements.pagesGrid.innerHTML = `<div class="info-block text-center w-100" style="color:var(--danger)">Failed to render PDF pages: ${error.message}</div>`;
@@ -739,6 +752,7 @@ async function renderSignWorkspace(file) {
       canvas.height = viewport.height;
       
       await page.render({ canvasContext: context, viewport: viewport }).promise;
+      page.cleanup();
 
       // Update signature placement metadata dimensions
       signaturePlacement = {
@@ -951,6 +965,10 @@ async function processActiveTool() {
           console.error(`Failed on ${currentFileToProcess.name}:`, e);
           allSuccess = false;
         }
+
+        // Clean temporary buffer and yield to event loop to allow GC and keep UI responsive
+        processedFileBytes = null;
+        await new Promise(resolve => setTimeout(resolve, 20));
       }
 
       if (!allSuccess) alert("Some files failed to process. Check console for details.");

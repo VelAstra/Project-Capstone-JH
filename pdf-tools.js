@@ -162,34 +162,55 @@ async function compressPdf(file, level, progressCallback) {
     quality = 0.45;
   }
   
-  for (let i = 1; i <= numPages; i++) {
-    if (progressCallback) progressCallback(i, numPages);
+  try {
+    for (let i = 1; i <= numPages; i++) {
+      if (progressCallback) progressCallback(i, numPages);
+      
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: scale });
+      
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      
+      // Use toBlob directly to avoid CPU and memory spikes of base64 encoding
+      const imgBytes = await new Promise(resolve => {
+        canvas.toBlob(async blob => {
+          if (blob) {
+            resolve(await blob.arrayBuffer());
+          } else {
+            const imgDataUrl = canvas.toDataURL('image/jpeg', quality);
+            const response = await fetch(imgDataUrl);
+            resolve(await response.arrayBuffer());
+          }
+        }, 'image/jpeg', quality);
+      });
+
+      // Explicitly dispose canvas buffer and page font caches immediately
+      canvas.width = 0;
+      canvas.height = 0;
+      page.cleanup();
+      
+      const embeddedImg = await compressedPdf.embedJpg(imgBytes);
+      const newPage = compressedPdf.addPage([viewport.width, viewport.height]);
+      newPage.drawImage(embeddedImg, {
+        x: 0,
+        y: 0,
+        width: viewport.width,
+        height: viewport.height,
+      });
+    }
     
-    const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale: scale });
-    
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-    
-    const imgDataUrl = canvas.toDataURL('image/jpeg', quality);
-    const response = await fetch(imgDataUrl);
-    const imgBytes = await response.arrayBuffer();
-    
-    const embeddedImg = await compressedPdf.embedJpg(imgBytes);
-    const newPage = compressedPdf.addPage([viewport.width, viewport.height]);
-    newPage.drawImage(embeddedImg, {
-      x: 0,
-      y: 0,
-      width: viewport.width,
-      height: viewport.height,
-    });
+    return await compressedPdf.save({ useObjectStreams: true });
+  } finally {
+    try {
+      await pdfDoc.cleanup();
+      await pdfDoc.destroy();
+    } catch { }
   }
-  
-  return await compressedPdf.save({ useObjectStreams: true });
 }
 
 /**
@@ -209,28 +230,40 @@ async function ocrPdf(file, lang, progressCallback) {
   
   let fullText = "";
   
-  // Tesseract library is loaded globally as Tesseract
-  for (let i = 1; i <= numPages; i++) {
-    if (progressCallback) progressCallback(i, numPages, 'extracting');
+  try {
+    // Tesseract library is loaded globally as Tesseract
+    for (let i = 1; i <= numPages; i++) {
+      if (progressCallback) progressCallback(i, numPages, 'extracting');
+      
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: 2.0 });
+      
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      
+      if (progressCallback) progressCallback(i, numPages, 'recognizing');
+      
+      // Perform OCR via global Tesseract
+      const result = await window.Tesseract.recognize(canvas, lang);
+      fullText += `--- Page ${i} ---\n\n${result.data.text}\n\n`;
+
+      // Free canvas bitmap and page font caches immediately
+      canvas.width = 0;
+      canvas.height = 0;
+      page.cleanup();
+    }
     
-    const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale: 2.0 });
-    
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-    
-    if (progressCallback) progressCallback(i, numPages, 'recognizing');
-    
-    // Perform OCR via global Tesseract
-    const result = await window.Tesseract.recognize(canvas, lang);
-    fullText += `--- Page ${i} ---\n\n${result.data.text}\n\n`;
+    return fullText;
+  } finally {
+    try {
+      await pdfDoc.cleanup();
+      await pdfDoc.destroy();
+    } catch { }
   }
-  
-  return fullText;
 }
 
 /**
@@ -291,27 +324,39 @@ async function pdfToJpg(file, scale, progressCallback) {
   
   const images = [];
   
-  for (let i = 1; i <= numPages; i++) {
-    if (progressCallback) progressCallback(i, numPages);
+  try {
+    for (let i = 1; i <= numPages; i++) {
+      if (progressCallback) progressCallback(i, numPages);
+      
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: parseFloat(scale) });
+      
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      images.push({
+        name: `${file.name.replace(/\.[^/.]+$/, "")}_page_${i}.jpg`,
+        dataUrl
+      });
+
+      // Free canvas bitmap and page font caches immediately
+      canvas.width = 0;
+      canvas.height = 0;
+      page.cleanup();
+    }
     
-    const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale: parseFloat(scale) });
-    
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-    
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-    images.push({
-      name: `${file.name.replace(/\.[^/.]+$/, "")}_page_${i}.jpg`,
-      dataUrl
-    });
+    return images;
+  } finally {
+    try {
+      await pdfDoc.cleanup();
+      await pdfDoc.destroy();
+    } catch { }
   }
-  
-  return images;
 }
 
 /**
@@ -331,31 +376,40 @@ async function pdfToText(file, includePageNum, progressCallback) {
   
   let extractedText = "";
   
-  for (let i = 1; i <= numPages; i++) {
-    if (progressCallback) progressCallback(i, numPages);
-    
-    const page = await pdfDoc.getPage(i);
-    const textContent = await page.getTextContent();
-    
-    let pageText = "";
-    let lastY = -1;
-    
-    for (const item of textContent.items) {
-      if (lastY !== -1 && Math.abs(item.transform[5] - lastY) > 5) {
-        pageText += "\n";
+  try {
+    for (let i = 1; i <= numPages; i++) {
+      if (progressCallback) progressCallback(i, numPages);
+      
+      const page = await pdfDoc.getPage(i);
+      const textContent = await page.getTextContent();
+      
+      let pageText = "";
+      let lastY = -1;
+      
+      for (const item of textContent.items) {
+        if (lastY !== -1 && Math.abs(item.transform[5] - lastY) > 5) {
+          pageText += "\n";
+        }
+        pageText += item.str + " ";
+        lastY = item.transform[5];
       }
-      pageText += item.str + " ";
-      lastY = item.transform[5];
+      
+      if (includePageNum) {
+        extractedText += `--- Page ${i} ---\n${pageText}\n\n`;
+      } else {
+        extractedText += pageText + "\n\n";
+      }
+
+      page.cleanup();
     }
     
-    if (includePageNum) {
-      extractedText += `--- Page ${i} ---\n${pageText}\n\n`;
-    } else {
-      extractedText += pageText + "\n\n";
-    }
+    return extractedText;
+  } finally {
+    try {
+      await pdfDoc.cleanup();
+      await pdfDoc.destroy();
+    } catch { }
   }
-  
-  return extractedText;
 }
 
 /**
@@ -958,83 +1012,100 @@ async function extractImages(file, options, progressCallback) {
   const zip = new window.JSZip();
   let imgCount = 0;
 
-  for (let i = 1; i <= numPages; i++) {
-    if (progressCallback) progressCallback(i, numPages);
-    
-    const page = await pdfDoc.getPage(i);
-    const ops = await page.getOperatorList();
-    
-    for (let j = 0; j < ops.fnArray.length; j++) {
-      const fn = ops.fnArray[j];
-      if (fn === pdfjsLib.OPS.paintImageXObject || fn === pdfjsLib.OPS.paintJpegXObject || fn === pdfjsLib.OPS.paintInlineImageXObject) {
-        const imgName = ops.argsArray[j][0];
-        try {
-          const img = await new Promise((resolve) => {
-            if (fn === pdfjsLib.OPS.paintInlineImageXObject) {
-              resolve(imgName); // For inline it's the image object directly
-            } else {
-              page.objs.get(imgName, (data) => resolve(data));
-            }
-          });
-          
-          if (!img) continue;
-          
-          imgCount++;
-          
-          // Render the raw image data to a canvas to get a JPG/PNG
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          
-          const imgData = ctx.createImageData(img.width, img.height);
-          
-          // Sometimes img.data is RGB, sometimes RGBA, sometimes it's a native Image element
-          if (img.data && img.data.length) {
-            // pdf.js usually provides RGBA or RGB
-            if (img.data.length === img.width * img.height * 4) {
-              imgData.data.set(img.data);
-            } else if (img.data.length === img.width * img.height * 3) {
-              let srcPtr = 0, destPtr = 0;
-              while (srcPtr < img.data.length) {
-                imgData.data[destPtr++] = img.data[srcPtr++];
-                imgData.data[destPtr++] = img.data[srcPtr++];
-                imgData.data[destPtr++] = img.data[srcPtr++];
-                imgData.data[destPtr++] = 255; // Alpha
+  try {
+    for (let i = 1; i <= numPages; i++) {
+      if (progressCallback) progressCallback(i, numPages);
+      
+      const page = await pdfDoc.getPage(i);
+      const ops = await page.getOperatorList();
+      
+      for (let j = 0; j < ops.fnArray.length; j++) {
+        const fn = ops.fnArray[j];
+        if (fn === pdfjsLib.OPS.paintImageXObject || fn === pdfjsLib.OPS.paintJpegXObject || fn === pdfjsLib.OPS.paintInlineImageXObject) {
+          const imgName = ops.argsArray[j][0];
+          try {
+            const img = await new Promise((resolve) => {
+              if (fn === pdfjsLib.OPS.paintInlineImageXObject) {
+                resolve(imgName); // For inline it's the image object directly
+              } else {
+                page.objs.get(imgName, (data) => resolve(data));
               }
+            });
+            
+            if (!img) continue;
+            
+            imgCount++;
+            
+            // Render the raw image data to a canvas to get a JPG/PNG
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            
+            const imgData = ctx.createImageData(img.width, img.height);
+            
+            // Sometimes img.data is RGB, sometimes RGBA, sometimes it's a native Image element
+            if (img.data && img.data.length) {
+              // pdf.js usually provides RGBA or RGB
+              if (img.data.length === img.width * img.height * 4) {
+                imgData.data.set(img.data);
+              } else if (img.data.length === img.width * img.height * 3) {
+                let srcPtr = 0, destPtr = 0;
+                while (srcPtr < img.data.length) {
+                  imgData.data[destPtr++] = img.data[srcPtr++];
+                  imgData.data[destPtr++] = img.data[srcPtr++];
+                  imgData.data[destPtr++] = img.data[srcPtr++];
+                  imgData.data[destPtr++] = 255; // Alpha
+                }
+              } else {
+                 // Grayscale or other format, fallback:
+                 ctx.fillStyle = 'white';
+                 ctx.fillRect(0,0, canvas.width, canvas.height);
+                 canvas.width = 0;
+                 canvas.height = 0;
+                 continue; 
+              }
+              ctx.putImageData(imgData, 0, 0);
+            } else if (img instanceof HTMLImageElement || img instanceof HTMLCanvasElement) {
+               ctx.drawImage(img, 0, 0);
             } else {
-               // Grayscale or other format, fallback:
-               ctx.fillStyle = 'white';
-               ctx.fillRect(0,0, canvas.width, canvas.height);
-               continue; 
+               canvas.width = 0;
+               canvas.height = 0;
+               continue;
             }
-            ctx.putImageData(imgData, 0, 0);
-          } else if (img instanceof HTMLImageElement || img instanceof HTMLCanvasElement) {
-             ctx.drawImage(img, 0, 0);
-          } else {
-             continue;
+            
+            // Default to PNG to avoid loss, but if HQ is off, we can use JPG
+            const type = options.hq ? 'image/png' : 'image/jpeg';
+            const ext = options.hq ? 'png' : 'jpg';
+            const dataUrl = canvas.toDataURL(type, 0.9);
+            
+            // Immediately clean up canvas buffer
+            canvas.width = 0;
+            canvas.height = 0;
+
+            const base64Data = dataUrl.split(',')[1];
+            zip.file(`image_p${i}_${imgCount}.${ext}`, base64Data, {base64: true});
+          } catch (e) {
+            console.warn("Could not extract image on page", i, e);
           }
-          
-          // Default to PNG to avoid loss, but if HQ is off, we can use JPG
-          const type = options.hq ? 'image/png' : 'image/jpeg';
-          const ext = options.hq ? 'png' : 'jpg';
-          const dataUrl = canvas.toDataURL(type, 0.9);
-          
-          const base64Data = dataUrl.split(',')[1];
-          zip.file(`image_p${i}_${imgCount}.${ext}`, base64Data, {base64: true});
-        } catch (e) {
-          console.warn("Could not extract image on page", i, e);
         }
       }
+
+      page.cleanup();
     }
+    
+    if (imgCount === 0) {
+      throw new Error("No embedded images were found in this document.");
+    }
+    
+    const content = await zip.generateAsync({ type: "uint8array" });
+    return content;
+  } finally {
+    try {
+      await pdfDoc.cleanup();
+      await pdfDoc.destroy();
+    } catch { }
   }
-  
-  if (imgCount === 0) {
-    throw new Error("No embedded images were found in this document.");
-  }
-  
-  const content = await zip.generateAsync({ type: "uint8array" });
-  return content;
 }
 
 /**
@@ -1117,4 +1188,76 @@ async function changePageSize(file, targetSize, scaleMode) {
   return await outPdf.save();
 }
 
-window.pdfTools = { mergePdfs, splitPdf, organizePdf, compressPdf, ocrPdf, jpgToPdf, pdfToJpg, pdfToText, htmlToPdf, addWatermark, addPageNumbers, protectPdf, unlockPdf, mockSummarize, pagesPerSheet, applyEditsToPdf, extractImages, flattenPdf, editMetadata, cropPdf, changePageSize };
+/**
+ * Get dimensions of each page in the PDF
+ * @param {File} file 
+ * @returns {Promise<Array<{width: number, height: number}>>}
+ */
+async function getPdfPageInfo(file) {
+  const { PDFDocument } = window.PDFLib;
+  const arrayBuffer = await file.arrayBuffer();
+  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const pages = pdfDoc.getPages();
+  const info = pages.map(p => {
+    const { width, height } = p.getSize();
+    return { width, height };
+  });
+  return info;
+}
+
+/**
+ * Render a single PDF page to a canvas with automatic memory cleanup
+ * @param {File} file 
+ * @param {number} pageIndex 
+ * @param {HTMLCanvasElement} canvas 
+ * @param {number} scale 
+ * @returns {Promise<{width: number, height: number}>}
+ */
+async function renderPdfPageToCanvas(file, pageIndex, canvas, scale = 1.0) {
+  const pdfjsLib = window.pdfjsLib;
+  const arrayBuffer = await file.arrayBuffer();
+  const pdfData = new Uint8Array(arrayBuffer);
+  const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+  const pdfDoc = await loadingTask.promise;
+  try {
+    const page = await pdfDoc.getPage(pageIndex + 1);
+    const viewport = page.getViewport({ scale: scale });
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const context = canvas.getContext('2d');
+    await page.render({ canvasContext: context, viewport: viewport }).promise;
+    page.cleanup();
+    return { width: viewport.width, height: viewport.height };
+  } finally {
+    try {
+      await pdfDoc.cleanup();
+      await pdfDoc.destroy();
+    } catch { }
+  }
+}
+
+window.pdfTools = { 
+  mergePdfs, 
+  splitPdf, 
+  organizePdf, 
+  compressPdf, 
+  ocrPdf, 
+  jpgToPdf, 
+  pdfToJpg, 
+  pdfToText, 
+  htmlToPdf, 
+  addWatermark, 
+  addPageNumbers, 
+  protectPdf, 
+  unlockPdf, 
+  mockSummarize, 
+  pagesPerSheet, 
+  applyEditsToPdf, 
+  extractImages, 
+  flattenPdf, 
+  editMetadata, 
+  cropPdf, 
+  changePageSize,
+  getPdfPageInfo,
+  renderPdfPageToCanvas
+};
