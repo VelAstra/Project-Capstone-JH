@@ -23,13 +23,10 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Run Tests
         run: npm test
-
-      - name: Build Web Assets
-        run: npm run build
 
       - name: Build Windows Installer & Portable
         run: npx electron-builder --win --x64
@@ -42,7 +39,7 @@ jobs:
           name: windows-release
           path: release/*.exe
 
-  # 2. BUILD LINUX RELEASE
+  # 2. BUILD LINUX RELEASE (AppImage)
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -55,16 +52,13 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Run Tests
         run: npm test
 
-      - name: Build Web Assets
-        run: npm run build
-
-      - name: Build Linux AppImage & Deb
-        run: npx electron-builder --linux --x64
+      - name: Build Linux AppImage
+        run: npx electron-builder --linux AppImage --x64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -72,11 +66,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-release
-          path: |
-            release/*.AppImage
-            release/*.deb
+          path: release/*.AppImage
 
-  # 3. BUILD MACOS RELEASE
+  # 3. BUILD MACOS RELEASE (DMG)
   build-macos:
     runs-on: macos-latest
     steps:
@@ -89,16 +81,13 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Run Tests
         run: npm test
 
-      - name: Build Web Assets
-        run: npm run build
-
       - name: Build macOS DMG
-        run: npx electron-builder --mac --universal
+        run: npx electron-builder --mac dmg
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -115,11 +104,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
@@ -129,26 +113,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Dependencies
-        run: |
-          npm ci || npm install
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-
-      - name: Build Web Assets
-        run: npm run build
-
-      - name: Initialize & Sync Capacitor Android
-        run: |
-          npx cap add android || true
-          npx cap sync android
-
       - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload Android APK Artifact
+      - name: Rename & Upload Android APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-release
@@ -183,14 +154,14 @@ jobs:
           name: android-release
           path: all-releases/android
 
-      - name: Publish GitHub Release with 4 Platform Binaries
+      - name: Publish GitHub Release with Standalone Platform Binaries
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: "OmniPDF Studio Release ${{ github.ref_name }}"
+          tag_name: v1.0.0
+          name: "OmniPDF Studio v1.0.0 - Official Multiplatform Release"
           draft: false
           prerelease: false
-          generate_release_notes: true
+          generate_release_notes: false
           files: |
             all-releases/windows/*
             all-releases/linux/*

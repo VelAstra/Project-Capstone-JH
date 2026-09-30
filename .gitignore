@@ -1,11 +1,43 @@
+# Dependencies
 node_modules/
+.pnpm-store/
+
+# Binaries & Release Executables
+*.exe
+*.apk
+*.AppImage
+*.dmg
+*.deb
 dist/
+dist-web/
+build-dist/
+dist-win/
+dist-win-single/
 release/
-android/
-.DS_Store
+all-releases/
+bin/
+obj/
+host/bin/
+host/obj/
+host/bundle.zip
+*.WebView2/
+
+# Android build cache (preserve android project source)
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/.idea/
+android/*.iml
+
+# Environment & Logs
+.env
+.env.local
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.env
-.env.local
+
+# System
+.DS_Store
+Thumbs.db

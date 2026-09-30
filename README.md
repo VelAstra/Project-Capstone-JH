@@ -1,125 +1,98 @@
-# Project-Capstone-JH: OmniPDF Studio
+# Project-Capstone-JH: OmniPDF Studio (PDF Suite Pro)
 
-> **Project Capstone** dibawah bimbingan **Bapak Janoe Hendarto**
-> Aplikasi Manipulasi PDF Multiplatform Lokal & 100% Offline (Windows, Linux, macOS, dan Android)
-
----
-
-## 🌐 1. Riset & Survei Fitur Aplikasi PDF di Internet
-
-Berdasarkan analisis mendalam terhadap berbagai platform manipulasi PDF populer dunia (*iLovePDF, Smallpdf, PDF24 Creator, Sejda PDF, Stirling-PDF, Adobe Acrobat DC, Foxit, PDF Candy, dan PDFtk*), berikut adalah taksonomi lengkap seluruh jasa dan fitur manipulasi PDF yang ada di internet:
-
-| Kategori | Fitur / Layanan Utama | Deskripsi & Kegunaan |
-| :--- | :--- | :--- |
-| **Pengorganisasian Halaman** | **Merge / Gabung PDF** | Menggabungkan beberapa dokumen PDF menjadi satu berkas secara berurutan. |
-| | **Split / Pisah PDF** | Memisahkan satu dokumen menjadi per halaman atau potongan rentang halaman (ZIP). |
-| | **Ekstrak Halaman** | Mengambil halaman spesifik (misal: 1, 3, 5-8) ke dalam berkas PDF mandiri. |
-| | **Hapus Halaman** | Membuang lembaran halaman yang tidak terpakai atau berlebih. |
-| | **Rotasi Halaman** | Memutar orientasi halaman (90°, 180°, 270°) per lembar atau massal. |
-| | **Urutkan / Balik (Reorder/Reverse)** | Mengubah urutan halaman atau membalik susunan dari belakang ke depan. |
-| | **Potong / Crop Margins** | Memangkas batas pinggir putih pada dokumen scan atau cetak. |
-| **Konversi Format** | **Gambar ke PDF (Images to PDF)** | Mengubah sekumpulan gambar (JPG, PNG, WebP) menjadi satu berkas PDF dengan layout A4/Letter. |
-| | **PDF ke Gambar (PDF to Images)** | Mengekstrak setiap halaman dokumen menjadi file JPG/PNG beresolusi tinggi. |
-| | **Office ke PDF & Sebaliknya** | Konversi dokumen Word (.docx), Excel (.xlsx), PowerPoint (.pptx) ke/dari format PDF. |
-| | **PDF ke Teks / Markdown** | Ekstraksi konten tekstual untuk keperluan dokumentasi atau LLM ingestion. |
-| | **HTML / Web ke PDF** | Merender tautan situs web atau file HTML menjadi format cetak dokumen PDF. |
-| **Keamanan & Legalitas** | **Watermark (Tanda Air)** | Membubuhkan teks cap kepemilikan/rahasia dengan sudut kemiringan dan transparansi. |
-| | **Tanda Tangan Digital (Sign PDF)** | Membubuhkan tanda tangan digital langsung melalui goresan tangan di canvas. |
-| | **Proteksi Kata Sandi (Protect/Encrypt)** | Mengunci akses dokumen menggunakan enkripsi password. |
-| | **Buka Sandi (Unlock/Decrypt)** | Menghapus penguncian sandi dari dokumen legal yang dimiliki. |
-| | **Redaksi & Sensor (Redaction/Whiteout)** | Menutupi data sensitif (PII) dengan blok hitam/putih permanen. |
-| | **Flatten PDF / Kunci Formulir** | Meratakan seluruh form input interaktif menjadi elemen statis agar tidak dapat diubah lagi. |
-| **Optimasi & Informasi** | **Kompresi PDF (Shrink & Compress)** | Merampingkan ukuran byte dokumen dengan merestrukturisasi alur objek stream. |
-| | **Nomor Halaman (Header & Footer)** | Menambahkan penomoran otomatis (`Halaman n dari total`) di posisi atas/bawah. |
-| | **Edit Metadata Dokumen** | Melihat & mengubah informasi *Judul, Penulis, Subjek, Kata Kunci, Pembuat*. |
-| | **Konversi Grayscale / Hitam Putih** | Mengubah seluruh spektrum warna menjadi hitam-putih untuk hemat tinta cetak. |
-| **Fitur Lanjutan (Advanced)** | **OCR (Optical Character Recognition)** | Mendeteksi teks pada dokumen hasil scan fisik. |
-| | **Bandingkan PDF (Compare PDFs)** | Menemukan perbedaan teks atau visual antara dua revisi dokumen PDF. |
-| | **Batch Processing Tanpa Batas** | Memproses ratusan dokumen sekaligus secara paralel tanpa batasan ukuran file. |
+> **Project Capstone** dibawah bimbingan **Bapak Janoe Hendarto**  
+> Aplikasi Manipulasi PDF Multiplatform Lokal & 100% Offline (Windows, Linux, macOS, dan Android).  
+> **100% Client-Side, Tanpa Server, Privasi Dokumen Terjamin Sepenuhnya.**
 
 ---
 
-## 🎨 2. Standar Desain UI & Palet Warna (Flat Design)
+## 📥 Unduh Installer Aplikasi (Tinggal Klik Tanpa CLI)
 
-Aplikasi dibangun dengan filosofi **Flat Design** murni (**tanpa gradien**), mengutamakan ketegasan visual, kontras tinggi, dan fungsionalitas:
+Pengguna tidak perlu menjalankan terminal atau instalasi rumit. Cukup unduh satu berkas installer sesuai sistem operasi Anda di [GitHub Releases v1.0.0](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.0.0):
+
+| Platform | Format Berkas | Tautan Unduhan Langsung | Keterangan |
+| :--- | :--- | :--- | :--- |
+| 🪟 **Windows** | `.exe` (Single File) | [Unduh PDFSuitePro-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/PDFSuitePro-Windows.exe) | Standalone WebView2 Executable, tinggal klik 2x langsung jalan. |
+| 📱 **Android** | `.apk` | [Unduh PDFSuitePro-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/PDFSuitePro-Android.apk) | Berkas paket Android mandiri, langsung install di HP/Tablet. |
+| 🐧 **Linux** | `.AppImage` | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Linux.AppImage) | Format universal Linux portable, cukup beri izin eksekusi (`chmod +x`). |
+| 🍎 **macOS** | `.dmg` | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-macOS.dmg) | Disk image resmi untuk Intel & Apple Silicon (M1/M2/M3/M4). |
+
+---
+
+## 🌐 1. Daftar Lengkap 26+ Fitur Manipulasi PDF
+
+Aplikasi ini mengadopsi seluruh rangkaian fitur lengkap dari **PDF-Suite-Pro** yang berjalan secara mandiri (*client-side*):
+
+### 📄 A. Manipulasi Halaman (Manipulate PDF)
+1. **Merge PDF**: Menggabungkan banyak file PDF menjadi satu berkas secara berurutan. Mendukung pemilihan file dalam jumlah tak terbatas.
+2. **Split PDF**: Memisahkan dokumen berdasarkan rentang halaman tertentu (misal: `1-3, 5, 8-10`) atau memecah per lembar.
+3. **Organize PDF**: Mengatur urutan halaman secara visual dengan sistem *drag and drop thumbnail*, membalik susunan, atau menghapus halaman tertentu.
+4. **Rotate PDF**: Memutar orientasi halaman (90°, 180°, 270°) untuk satu halaman spesifik atau sekaligus seluruh dokumen.
+5. **Remove Pages**: Menghapus halaman-halaman yang tidak diinginkan dengan memilih kartu preview halaman.
+6. **Extract Pages**: Mengambil halaman-halaman tertentu dan menyimpannya menjadi dokumen PDF baru.
+
+### ✍️ B. Edit & Tambah Konten (Edit & Add)
+7. **Visual PDF Editor**: Kanvas interaktif untuk menggambar bebas (*freehand pencil*), menambahkan teks kustom, garis penyorot (*highlighter*), bentuk kotak/lingkaran, serta riwayat *undo/redo*.
+8. **Sign PDF (Tanda Tangan Digital)**: Modal interaktif penoreh tanda tangan dengan *Signature Pad*, dapat diatur ukuran, warna goresan, posisi peletakan, dan dibubuhkan langsung ke lembaran PDF.
+9. **Watermark (Tanda Air)**: Membubuhkan cap teks identitas kepemilikan/rahasia dengan opsi transparansi (*opacity*), ukuran huruf, sudut rotasi, dan warna.
+10. **Page Numbers**: Menambahkan nomor halaman otomatis (`Halaman n dari total`) dengan pilihan posisi (bawah-tengah, bawah-kanan, atas).
+11. **Flatten PDF**: Meratakan formulir interaktif dan anotasi menjadi konten statis agar tidak dapat diubah lagi.
+
+### 🔄 C. Konversi dari PDF (Convert from PDF)
+12. **PDF to JPG**: Merender setiap halaman PDF menjadi berkas gambar JPG beresolusi tinggi dengan opsi unduh massal format ZIP.
+13. **PDF to Text**: Mengekstrak seluruh teks dari dokumen PDF ke dalam berkas teks (.txt).
+14. **Extract Images**: Mendeteksi dan mengekstrak semua elemen gambar tersemat di dalam file PDF.
+15. **OCR PDF (Optical Character Recognition)**: Mengenali teks pada lembaran hasil scan fisik menggunakan engine Tesseract.js offline.
+
+### 📥 D. Konversi ke PDF (Convert to PDF)
+16. **PPT to PDF**: Mengonversi presentasi PowerPoint (.pptx) menjadi format cetak dokumen PDF.
+17. **JPG to PDF**: Menggabungkan banyak gambar foto/scan (JPG, PNG) menjadi satu berkas PDF dengan opsi orientasi dan margin.
+18. **HTML to PDF**: Merender dokumen berbasis markup HTML menjadi lembaran PDF.
+
+### 🔒 E. Keamanan & Optimasi (Security & Optimize)
+19. **Compress PDF**: Merampingkan ukuran byte dokumen dengan mengompresi gambar dan merestrukturisasi alur objek stream.
+20. **Protect PDF**: Mengunci dan mengenkripsi dokumen dengan kata sandi (*AES password encryption*).
+21. **Unlock PDF**: Membuka kunci dokumen terproteksi password yang sah.
+22. **PDF Metadata**: Melihat dan menyunting informasi metadata dokumen (*Title, Author, Subject, Keywords, Creator*).
+
+### 📐 F. Tata Letak & Cetak (Layout & Print)
+23. **Pages Per Sheet (N-Up)**: Menyusun multi-halaman dalam satu lembar cetak (2 halaman per lembar, 4 halaman, 9 halaman, atau 16 halaman).
+24. **Crop PDF**: Memangkas batas margin putih pada dokumen secara proporsional.
+25. **Change Page Size**: Mengubah ukuran standar lembaran PDF (A4, US Letter, Legal, Tabloid).
+
+### 🤖 G. Kecerdasan Dokumen (Intelligence)
+26. **AI Summarizer & Translate**: Analisis rangkuman poin-poin penting isi dokumen dan penerjemahan teks.
+
+---
+
+## 🎨 2. Desain Flat Murni & Palet Warna Sesuai Spesifikasi
+
+Aplikasi dirancang dengan tampilan **Flat Design** (bebas dari efek gradien linear/radial) untuk menghadirkan ketegasan visual yang bersih, modern, dan nyaman di mata:
 
 ### ☀️ Mode Terang (Light Mode)
-* **`#FBFFE4`**: Latar belakang utama (background) dokumen dan kanvas yang ramah mata.
-* **`#3D8D7A`**: Warna primer tombol aksi utama, header aksen, dan garis batas solid.
-* **`#B3D8A8`**: Warna sekunder untuk kartu ringkasan, badge, dan hover efek.
-* **`#A3D1C6`**: Warna batas panel, sub-surface, serta latar belakang bilah sisi (sidebar).
+* **`#FBFFE4`**: Latar belakang aplikasi (*App Background*).
+* **`#3D8D7A`**: Warna primer untuk tombol aksi utama, header aksen, dan status aktif.
+* **`#B3D8A8`**: Warna aksen untuk garis batas (*borders*) kartu dan sorotan elemen.
+* **`#A3D1C6`**: Latar belakang bilah sisi (*sidebar*) dan kontainer kartu sekunder.
+* **`#092328`**: Teks utama berdaya kontras tinggi.
 
 ### 🌙 Mode Gelap (Dark Mode)
-* **`#092328`**: Latar belakang utama (deep slate-teal) yang hemat daya.
-* **`#12544F`**: Warna permukaan kartu (surface) dan bilah sisi (sidebar).
-* **`#2A835F`**: Warna primer tombol aksi dan indikator status aktif.
-* **`#8BBB92`**: Warna sekunder untuk teks sorotan, ikon, dan garis batas halus.
+* **`#092328`**: Latar belakang aplikasi (*Deep Slate Background*).
+* **`#12544F`**: Permukaan bilah sisi (*sidebar*) dan kartu fitur (*card background*).
+* **`#2A835F`**: Warna primer tombol aksi utama dan indikator aktif.
+* **`#8BBB92`**: Warna aksen untuk teks sekunder, ikon, dan garis batas halus.
+* **`#FBFFE4`**: Teks utama kontras terang.
 
-> **Tombol Pengubah Tema:** Terdapat tombol *switch* langsung di pojok kanan atas layar dan di bilah sisi (*sidebar*) yang menyimpan preferensi tema ke `localStorage`.
-
----
-
-## 🚀 3. Arsitektur 100% Lokal & Offline
-
-* **Zero Cloud Dependency**: Semua manipulasi PDF dijalankan langsung pada memori perangkat menggunakan engine berbasis JavaScript modern (`pdf-lib`, `jszip`, dan HTML5 Canvas).
-* **Privasi 100% Terjaga**: Dokumen tidak pernah diunggah ke server manapun di internet.
-* **Batch Processing Fleksibel**: Pengguna dapat memilih berapapun banyaknya file PDF maupun gambar sekaligus.
+> **Pengalih Tema Instan:** Tombol matahari/bulan di bagian atas (*header*) dan di bilah sisi (*sidebar*) memungkinkan peralihan instan antara tema terang dan tema gelap, tersimpan otomatis di `localStorage`.
 
 ---
 
-## 📦 4. Distribusi Multiplatform (4 Target Rilis di GitHub)
+## 🛡️ 3. Jaminan Privasi 100% Offline
 
-Proyek ini telah dilengkapi dengan pipeline otomatis **GitHub Actions** (`.github/workflows/release.yml`) yang secara otomatis membuat 4 file rilis (*GitHub Release*) untuk setiap platform:
-
-1. **Windows**: Installer (`.exe`) & Portable Executable (`.exe`).
-2. **Linux**: Format universal (`.AppImage`) & paket Debian/Ubuntu (`.deb`).
-3. **macOS**: Apple Disk Image (`.dmg`) untuk Intel dan Apple Silicon.
-4. **Android**: Berkas instalasi mandiri Android Package (`.apk`).
+Seluruh proses komputasi, render, konversi, dan manipulasi berkas PDF dieksekusi 100% di sisi klien (*client-side*). Berkas Anda **tidak pernah dikirim ke internet atau server pihak ketiga mana pun**.
 
 ---
 
-## 🛠️ 5. Cara Menjalankan Aplikasi Secara Lokal
+## 📜 4. Lisensi
 
-### Prasyarat
-* Node.js (v18 ke atas) & npm
-
-### Menjalankan Versi Web / Dev Server
-```bash
-# 1. Masuk ke direktori proyek
-cd Project-Capstone-JH
-
-# 2. Pasang dependensi
-npm install
-
-# 3. Jalankan pengujian otomatis (Unit Tests)
-npm test
-
-# 4. Jalankan mode pengembangan
-npm run dev
-```
-Buka browser pada alamat `http://localhost:5173`.
-
-### Menjalankan Aplikasi Desktop (Electron)
-```bash
-npm run electron:dev
-```
-
-### Membangun Paket Android APK
-```bash
-npm run cap:build
-```
-
----
-
-## 🧪 6. Hasil Verifikasi Otomatis
-Unit test mencakup pengujian komprehensif terhadap operasi inti:
-* ✅ Penggabungan berkas (*Merge PDF*)
-* ✅ Pemisahan halaman (*Split PDF*)
-* ✅ Ekstraksi rentang halaman (*Extract Pages*)
-* ✅ Penghapusan halaman (*Delete Pages*)
-* ✅ Rotasi sudut halaman (*Rotate Pages*)
-* ✅ Penambahan tanda air (*Watermark*)
-* ✅ Penomoran halaman dinamis (*Page Numbers*)
-* ✅ Modifikasi metadata dokumen (*Metadata Update*)
-
-Seluruh pengujian lolos dengan exit code `0`.
+Proyek ini dilisensikan di bawah lisensi terbuka [GNU General Public License v3.0 (GPL-3.0)](file:///C:/Users/Rayhan/Documents/GitHub/Project-Capstone-JH/LICENSE).

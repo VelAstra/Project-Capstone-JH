@@ -1,64 +1,946 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>OmniPDF Studio - Aplikasi Manipulasi PDF Offline</title>
-  <link rel="stylesheet" href="./src/styles.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233D8D7A'><path d='M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Suite Pro - 100% Secure Client-Side PDF Tools</title>
+  <!-- Google Fonts - Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="assets/libs/fontawesome/css/all.min.css">
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- PDF-Lib CDN -->
+  <script src="assets/libs/pdf-lib.min.js"></script>
+  <!-- PDF.js CDN -->
+  <script src="assets/libs/pdf.min.js"></script>
+  <!-- Tesseract.js for OCR -->
+  <script src="assets/libs/tesseract.min.js"></script>
+  <!-- Signature Pad -->
+  <script src="assets/libs/signature_pad.umd.min.js"></script>
+  <!-- JSZip for batch downloads -->
+  <script src="assets/libs/jszip.min.js"></script>
 </head>
-<body>
+<body class="dark-theme">
   <div class="app-container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="brand-icon">P</div>
-        <div>
-          <div class="brand-title">OmniPDF Studio</div>
-          <div class="brand-subtitle">100% Lokal & Offline</div>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon">
+          <i class="fa-solid fa-file-pdf"></i>
+        </div>
+        <div class="logo-text">
+          <h2>PDF Suite <span>Pro</span></h2>
+          <span class="badge">100% Client-Side</span>
         </div>
       </div>
+      
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+          <i class="fa-solid fa-table-columns"></i> Dashboard
+        </a>
+        <div class="nav-section-title">Manipulate PDF</div>
+        <a href="#merge" class="nav-item" data-tab="merge"><i class="fa-solid fa-code-merge"></i> Merge PDF</a>
+        <a href="#split" class="nav-item" data-tab="split"><i class="fa-solid fa-scissors"></i> Split PDF</a>
+        <a href="#organize" class="nav-item" data-tab="organize"><i class="fa-solid fa-folder-open"></i> Organize PDF</a>
+        <a href="#rotate" class="nav-item" data-tab="rotate"><i class="fa-solid fa-rotate-right"></i> Rotate PDF</a>
+        <a href="#remove" class="nav-item" data-tab="remove"><i class="fa-solid fa-file-circle-minus"></i> Remove Pages</a>
+        <a href="#extract" class="nav-item" data-tab="extract"><i class="fa-solid fa-file-export"></i> Extract Pages</a>
 
-      <nav class="sidebar-nav" id="sidebar-nav">
-        <!-- Rendered dynamically by app.js -->
+        <div class="nav-section-title">Edit & Add</div>
+        <a href="#edit" class="nav-item" data-tab="edit"><i class="fa-solid fa-pen-to-square"></i> Edit PDF</a>
+        <a href="#sign" class="nav-item" data-tab="sign"><i class="fa-solid fa-signature"></i> Sign PDF</a>
+        <a href="#watermark" class="nav-item" data-tab="watermark"><i class="fa-solid fa-stamp"></i> Watermark</a>
+        <a href="#page-numbers" class="nav-item" data-tab="page-numbers"><i class="fa-solid fa-hashtag"></i> Page Numbers</a>
+        <a href="#flatten-pdf" class="nav-item" data-tab="flatten-pdf"><i class="fa-solid fa-layer-group"></i> Flatten PDF</a>
+
+        <div class="nav-section-title">Convert from PDF</div>
+        <a href="#pdf-to-jpg" class="nav-item" data-tab="pdf-to-jpg"><i class="fa-solid fa-images"></i> PDF to JPG</a>
+        <a href="#pdf-to-text" class="nav-item" data-tab="pdf-to-text"><i class="fa-solid fa-file-lines"></i> PDF to Text</a>
+        <a href="#extract-images" class="nav-item" data-tab="extract-images"><i class="fa-solid fa-image"></i> Extract Images</a>
+        <a href="#ocr" class="nav-item" data-tab="ocr"><i class="fa-solid fa-eye"></i> OCR PDF</a>
+
+        <div class="nav-section-title">Convert to PDF</div>
+        <a href="#ppt-to-pdf" class="nav-item" id="nav-ppt-to-pdf" data-tab="ppt-to-pdf"><i class="fa-solid fa-file-powerpoint"></i> PPT to PDF</a>
+        <a href="#jpg-to-pdf" class="nav-item" data-tab="jpg-to-pdf"><i class="fa-regular fa-image"></i> JPG to PDF</a>
+        <a href="#html-to-pdf" class="nav-item" data-tab="html-to-pdf"><i class="fa-solid fa-code"></i> HTML to PDF</a>
+
+        <div class="nav-section-title">Security & Optimize</div>
+        <a href="#compress" class="nav-item" data-tab="compress"><i class="fa-solid fa-minimize"></i> Compress PDF</a>
+        <a href="#protect" class="nav-item" data-tab="protect"><i class="fa-solid fa-lock"></i> Protect PDF</a>
+        <a href="#unlock" class="nav-item" data-tab="unlock"><i class="fa-solid fa-lock-open"></i> Unlock PDF</a>
+        <a href="#edit-metadata" class="nav-item" data-tab="edit-metadata"><i class="fa-solid fa-tags"></i> PDF Metadata</a>
+
+        <div class="nav-section-title">Layout & Print</div>
+        <a href="#pages-per-sheet" class="nav-item" data-tab="pages-per-sheet"><i class="fa-solid fa-table-cells"></i> Pages Per Sheet</a>
+        <a href="#crop-pdf" class="nav-item" data-tab="crop-pdf"><i class="fa-solid fa-crop"></i> Crop PDF</a>
+        <a href="#change-page-size" class="nav-item" data-tab="change-page-size"><i class="fa-solid fa-expand"></i> Change Page Size</a>
+
+        <div class="nav-section-title">Intelligence</div>
+        <a href="#ai-summarizer" class="nav-item" data-tab="ai-summarizer"><i class="fa-solid fa-robot"></i> AI Summarizer</a>
+        <a href="#translate" class="nav-item" data-tab="translate"><i class="fa-solid fa-language"></i> Translate PDF</a>
       </nav>
-
+      
       <div class="sidebar-footer">
-        <div class="badge-offline">
-          <span class="status-dot"></span>
-          <span>Offline & Aman (Privasi 100%)</span>
-        </div>
-        <button id="sidebar-theme-btn" class="btn-theme-toggle" style="width: 100%; justify-content: center;">
-          <span class="theme-icon">🌙</span>
-          <span class="theme-label">Mode Gelap</span>
+        <button id="btn-settings" class="btn-sidebar-settings">
+          <i class="fa-solid fa-gear"></i> Keys & Settings
         </button>
+        <div class="security-toast">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Local execution. No servers.</span>
+        </div>
       </div>
     </aside>
 
-    <!-- MAIN WRAPPER -->
-    <div class="main-wrapper">
-      <!-- TOPBAR -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Buka Menu">☰</button>
-          <div class="topbar-title" id="page-title">Beranda</div>
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="app-header">
+        <div class="header-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="search-tools" placeholder="Search for a tool (e.g. Merge, OCR, Protect)...">
         </div>
-        <div class="topbar-right">
-          <!-- THEME TOGGLE BUTTON -->
-          <button id="home-theme-btn" class="btn-theme-toggle" title="Ubah Tema Tampilan">
-            <span class="theme-icon">🌙</span>
-            <span class="theme-label">Ubah Tema</span>
+        <div class="header-actions">
+          <div class="status-indicator">
+            <span class="status-dot green"></span>
+            <span>Private Sandbox Active</span>
+          </div>
+          <button id="theme-toggle" class="theme-btn">
+            <i class="fa-solid fa-sun"></i>
           </button>
         </div>
       </header>
 
-      <!-- CONTENT BODY -->
-      <main class="content-body" id="main-content">
-        <!-- Content will be swapped between Home and Active Tool by app.js -->
-      </main>
+      <!-- Dashboard View -->
+      <section id="view-dashboard" class="content-view active">
+        <div class="welcome-banner">
+          <div class="welcome-text">
+            <h1>All the PDF Tools You Need, <span>100% Private</span></h1>
+            <p>Process, sign, and convert PDF documents in your browser. Files never leave your machine.</p>
+          </div>
+          <div class="welcome-stats">
+            <div class="stat-card">
+              <span class="stat-num" id="stat-files-processed">0</span>
+              <span class="stat-label">Files Processed</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-num" id="stat-privacy-saved">100%</span>
+              <span class="stat-label">Data Privacy</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tools-grid-container">
+          <!-- Manipulate PDF -->
+          <div class="grid-section">
+            <h3 class="section-title">Manipulate PDF</h3>
+            <div class="tools-grid">
+              <div class="tool-card" data-target="merge">
+                <div class="tool-icon gradient-purple"><i class="fa-solid fa-code-merge"></i></div>
+                <h4>Merge PDF</h4><p>Combine multiple PDF files into one easily.</p>
+              </div>
+              <div class="tool-card" data-target="split">
+                <div class="tool-icon gradient-blue"><i class="fa-solid fa-scissors"></i></div>
+                <h4>Split PDF</h4><p>Extract specific ranges or pages into separate PDFs.</p>
+              </div>
+              <div class="tool-card" data-target="organize">
+                <div class="tool-icon gradient-teal"><i class="fa-solid fa-folder-open"></i></div>
+                <h4>Organize PDF</h4><p>Reorder or delete pages visually.</p>
+              </div>
+              <div class="tool-card" data-target="rotate">
+                <div class="tool-icon gradient-cyan"><i class="fa-solid fa-rotate-right"></i></div>
+                <h4>Rotate PDF</h4><p>Rotate all or specific pages in a PDF.</p>
+              </div>
+              <div class="tool-card" data-target="remove">
+                <div class="tool-icon gradient-red"><i class="fa-solid fa-file-circle-minus"></i></div>
+                <h4>Remove Pages</h4><p>Remove specific pages from a PDF.</p>
+              </div>
+              <div class="tool-card" data-target="extract">
+                <div class="tool-icon gradient-orange"><i class="fa-solid fa-file-export"></i></div>
+                <h4>Extract Pages</h4><p>Extract selected pages into a new PDF.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit & Add -->
+          <div class="grid-section">
+            <h3 class="section-title">Edit & Add</h3>
+            <div class="tools-grid">
+              <div class="tool-card" data-target="edit">
+                <div class="tool-icon gradient-orange"><i class="fa-solid fa-pen-to-square"></i></div>
+                <h4>Edit PDF</h4><p>Visually add text, images, and drawings to pages.</p>
+              </div>
+              <div class="tool-card" data-target="sign">
+                <div class="tool-icon gradient-rose"><i class="fa-solid fa-signature"></i></div>
+                <h4>Sign PDF</h4><p>Draw and place signatures visually on documents.</p>
+              </div>
+              <div class="tool-card" data-target="watermark">
+                <div class="tool-icon gradient-violet"><i class="fa-solid fa-stamp"></i></div>
+                <h4>Watermark</h4><p>Add text overlay with custom font, angle & transparency.</p>
+              </div>
+              <div class="tool-card" data-target="page-numbers">
+                <div class="tool-icon gradient-cyan"><i class="fa-solid fa-hashtag"></i></div>
+                <h4>Page Numbers</h4><p>Add page numbers with custom layout & formatting.</p>
+              </div>
+              <div class="tool-card" data-target="flatten-pdf">
+                <div class="tool-icon gradient-teal"><i class="fa-solid fa-layer-group"></i></div>
+                <h4>Flatten PDF</h4><p>Convert interactive forms to static visual graphics.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Convert from PDF -->
+          <div class="grid-section">
+            <h3 class="section-title">Convert from PDF</h3>
+            <div class="tools-grid">
+              <div class="tool-card" data-target="pdf-to-jpg">
+                <div class="tool-icon gradient-orange"><i class="fa-solid fa-images"></i></div>
+                <h4>PDF to JPG</h4><p>Export pages as JPG images.</p>
+              </div>
+              <div class="tool-card" data-target="pdf-to-text">
+                <div class="tool-icon gradient-red"><i class="fa-solid fa-file-lines"></i></div>
+                <h4>PDF to Text</h4><p>Extract all text content from a PDF file.</p>
+              </div>
+              <div class="tool-card" data-target="extract-images">
+                <div class="tool-icon gradient-pink"><i class="fa-solid fa-image"></i></div>
+                <h4>Extract Images</h4><p>Extract all embedded images from a PDF.</p>
+              </div>
+              <div class="tool-card" data-target="ocr">
+                <div class="tool-icon gradient-yellow"><i class="fa-solid fa-eye"></i></div>
+                <h4>OCR PDF</h4><p>Convert scanned PDF pages to searchable text.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Convert to PDF -->
+          <div class="grid-section">
+            <h3 class="section-title">Convert to PDF</h3>
+            <div class="tools-grid">
+              <div class="tool-card" id="card-ppt-to-pdf" data-target="ppt-to-pdf">
+                <div class="tool-icon gradient-crimson"><i class="fa-solid fa-file-powerpoint"></i></div>
+                <h4>PPT to PDF</h4><p>Convert PowerPoint presentations (.pptx) to PDF.</p>
+              </div>
+              <div class="tool-card" data-target="jpg-to-pdf">
+                <div class="tool-icon gradient-pink"><i class="fa-regular fa-image"></i></div>
+                <h4>JPG to PDF</h4><p>Convert images to high quality PDFs.</p>
+              </div>
+              <div class="tool-card" data-target="html-to-pdf">
+                <div class="tool-icon gradient-indigo"><i class="fa-solid fa-code"></i></div>
+                <h4>HTML to PDF</h4><p>Generate a PDF directly from HTML code or custom text.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security & Optimize -->
+          <div class="grid-section">
+            <h3 class="section-title">Security & Optimize</h3>
+            <div class="tools-grid">
+              <div class="tool-card" data-target="compress">
+                <div class="tool-icon gradient-green"><i class="fa-solid fa-minimize"></i></div>
+                <h4>Compress PDF</h4><p>Reduce file size while keeping visual quality.</p>
+              </div>
+              <div class="tool-card" data-target="protect">
+                <div class="tool-icon gradient-crimson"><i class="fa-solid fa-lock"></i></div>
+                <h4>Protect PDF</h4><p>Encrypt PDF files with a secure password.</p>
+              </div>
+              <div class="tool-card" data-target="unlock">
+                <div class="tool-icon gradient-amber"><i class="fa-solid fa-lock-open"></i></div>
+                <h4>Unlock PDF</h4><p>Remove passwords and restrictions from PDFs.</p>
+              </div>
+              <div class="tool-card" data-target="edit-metadata">
+                <div class="tool-icon gradient-slate"><i class="fa-solid fa-tags"></i></div>
+                <h4>PDF Metadata</h4><p>Edit or remove Author, Title, and other hidden metadata.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Layout & Print -->
+          <div class="grid-section">
+            <h3 class="section-title">Layout & Print</h3>
+            <div class="tools-grid">
+              <div class="tool-card" data-target="pages-per-sheet">
+                <div class="tool-icon gradient-slate"><i class="fa-solid fa-table-cells"></i></div>
+                <h4>Pages Per Sheet</h4><p>Fit multiple pages onto a single sheet for compact printing.</p>
+              </div>
+              <div class="tool-card" data-target="crop-pdf">
+                <div class="tool-icon gradient-purple"><i class="fa-solid fa-crop"></i></div>
+                <h4>Crop PDF</h4><p>Crop the margins or visible area of your PDF pages.</p>
+              </div>
+              <div class="tool-card" data-target="change-page-size">
+                <div class="tool-icon gradient-rose"><i class="fa-solid fa-expand"></i></div>
+                <h4>Change Page Size</h4><p>Resize all pages to a standard size like A4 or Letter.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Intelligence -->
+          <div class="grid-section">
+            <h3 class="section-title">AI & Intelligence</h3>
+            <div class="tools-grid">
+              <div class="tool-card" data-target="ai-summarizer">
+                <div class="tool-icon gradient-azure"><i class="fa-solid fa-robot"></i></div>
+                <h4>AI Summarizer</h4><p>Summarize lengthy PDF contents using local or API-driven AI.</p>
+              </div>
+              <div class="tool-card" data-target="translate">
+                <div class="tool-icon gradient-emerald"><i class="fa-solid fa-language"></i></div>
+                <h4>Translate PDF</h4><p>Translate document text to another language dynamically.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tool Workspace View (Dynamically switches content based on active tool) -->
+      <section id="view-workspace" class="content-view">
+        <div class="workspace-header">
+          <button id="btn-back-dashboard" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+          </button>
+          <div class="tool-title-wrapper">
+            <div class="workspace-tool-icon" id="workspace-icon">
+              <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <div>
+              <h1 id="workspace-title">Tool Name</h1>
+              <p id="workspace-desc">Tool description matches target.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="workspace-body">
+          <div class="workspace-left">
+            <!-- File Dropzone -->
+            <div class="dropzone" id="file-dropzone">
+              <input type="file" id="file-input" multiple hidden>
+              <div class="dropzone-content">
+                <div class="dropzone-icon">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h3>Drag & drop your files here</h3>
+                <p>or <span class="highlight">browse files</span> from your computer</p>
+                <span class="file-limits" id="dropzone-limits">Supports .pdf documents</span>
+              </div>
+            </div>
+
+            <!-- Uploaded Files List -->
+            <div class="files-list-container" id="files-list-container" style="display: none;">
+              <div class="files-list-header">
+                <h3>Uploaded Files (<span id="files-count">0</span>)</h3>
+                <button id="btn-clear-files" class="btn-text"><i class="fa-solid fa-trash-can"></i> Clear All</button>
+              </div>
+              <div class="files-list" id="files-list">
+                <!-- File items dynamically added here -->
+              </div>
+            </div>
+
+            <!-- Visual Drag-and-Drop / Interactive PDF Page Area (Organize and Sign Tools) -->
+            <div class="interactive-workspace" id="interactive-workspace" style="display: none;">
+              <div class="workspace-bar">
+                <h3>Visual PDF Editor</h3>
+                <div class="workspace-bar-actions" id="visual-actions">
+                  <!-- Actions dynamically added -->
+                </div>
+              </div>
+              <div class="pages-grid" id="pages-grid">
+                <!-- Pages dynamically rendered here -->
+              </div>
+            </div>
+          </div>
+
+          <div class="workspace-right">
+            <!-- Control / Config Box -->
+            <div class="config-panel">
+              <h3>Configuration</h3>
+              <div id="tool-configs">
+                <!-- Specific Config markup injected here per tool -->
+              </div>
+
+              <div class="action-trigger-box">
+                <button id="btn-process-pdf" class="btn-primary" disabled>
+                  <span>Process Files</span>
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+                <div class="progress-bar-container" id="process-progress" style="display: none;">
+                  <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+                  </div>
+                  <span class="progress-text" id="progress-text">Processing... 0%</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Result Box -->
+            <div class="result-panel" id="result-panel" style="display: none;">
+              <div class="success-header">
+                <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <h3>Process Completed!</h3>
+              </div>
+              <div class="result-details">
+                <p><strong>Result File:</strong> <span id="result-filename">document_processed.pdf</span></p>
+                <p><strong>Size:</strong> <span id="result-filesize">0 KB</span></p>
+                <p id="result-savings-row" style="display:none;"><strong>Compression Savings:</strong> <span id="result-savings">0%</span></p>
+              </div>
+              <button id="btn-download-result" class="btn-success">
+                <i class="fa-solid fa-download"></i> Download File
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Settings Dialog Modal -->
+  <div class="modal-backdrop" id="settings-modal" style="display: none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-gear"></i> Keys & Settings</h2>
+        <button class="modal-close" id="btn-close-settings">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="settings-intro">Configure external API keys for advanced intelligence features. These keys are stored purely in your browser's local storage and never sent anywhere else.</p>
+        
+        <div class="form-group">
+          <label for="gemini-api-key">Gemini API Key (Recommended for Summaries/Translation)</label>
+          <input type="password" id="gemini-api-key" placeholder="AIzaSy...">
+          <span class="form-hint">Obtain from <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="openai-api-key">OpenAI API Key (Alternative)</label>
+          <input type="password" id="openai-api-key" placeholder="sk-proj-...">
+          <span class="form-hint">Obtain from OpenAI Platform dashboard.</span>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="prefer-gemini" checked>
+          <label for="prefer-gemini">Prefer Gemini for AI Tasks</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btn-clear-settings">Reset Defaults</button>
+        <button class="btn-primary" id="btn-save-settings">Save Changes</button>
+      </div>
     </div>
   </div>
 
-  <script type="module" src="./src/app.js"></script>
+  <!-- Interactive Sign Modal (Drawing Pad and Placement Preview) -->
+  <div class="modal-backdrop" id="sign-canvas-modal" style="display: none;">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-signature"></i> Create Signature</h2>
+        <button class="modal-close" id="btn-close-sign-modal">&times;</button>
+      </div>
+      <div class="modal-body pad-split-layout">
+        <!-- Drawing Pad -->
+        <div class="pad-draw-section">
+          <h3>Draw Signature</h3>
+          <div class="canvas-wrapper">
+            <canvas id="signature-canvas" width="400" height="200"></canvas>
+          </div>
+          <div class="canvas-actions">
+            <button id="btn-clear-pad" class="btn-secondary btn-sm"><i class="fa-solid fa-eraser"></i> Clear Pad</button>
+            <div class="color-options">
+              <button class="color-dot active" data-color="#000000" style="background-color: #000000;"></button>
+              <button class="color-dot" data-color="#0000ff" style="background-color: #0000ff;"></button>
+              <button class="color-dot" data-color="#ff0000" style="background-color: #ff0000;"></button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Text Signature Option -->
+        <div class="pad-text-section">
+          <h3>Or Type Signature</h3>
+          <div class="form-group">
+            <input type="text" id="typed-signature-input" placeholder="Type your name here...">
+          </div>
+          <div class="signature-font-previews">
+            <div class="font-preview cursive-1" data-font="cursive-1">Signature Preview</div>
+            <div class="font-preview cursive-2" data-font="cursive-2">Signature Preview</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btn-cancel-signature">Cancel</button>
+        <button class="btn-primary" id="btn-use-signature">Use Signature</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates for Tool Configurations (Loaded dynamically in js) -->
+  <div id="templates" style="display: none;">
+    
+    <!-- Config: Merge -->
+    <div id="tpl-merge">
+      <p class="config-desc">Upload multiple files. Drag them to reorder in the files list, then click process.</p>
+      <div class="form-group">
+        <label>File Processing Order</label>
+        <span class="info-block">The PDFs will be combined sequentially from top to bottom as listed in the files list.</span>
+      </div>
+    </div>
+
+    <!-- Config: Split -->
+    <div id="tpl-split">
+      <div class="form-group">
+        <label>Split Mode</label>
+        <select id="split-mode" class="form-select">
+          <option value="range">Extract Range of Pages</option>
+          <option value="individual">Extract Every Page Individually</option>
+        </select>
+      </div>
+      <div id="split-range-controls">
+        <div class="form-group">
+          <label for="split-ranges">Ranges (e.g. 1-3, 5, 8-10)</label>
+          <input type="text" id="split-ranges" class="form-control" value="1">
+          <span class="form-hint">Use commas to separate multiple ranges or single pages.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Config: Organize -->
+    <div id="tpl-organize">
+      <p class="config-desc">Below, you can drag and drop pages to reorder them, click pages to rotate them, or click delete to remove specific pages.</p>
+      <div class="form-group">
+        <button id="btn-select-all-pages" class="btn-secondary btn-sm">Select All Pages</button>
+        <button id="btn-rotate-all-pages" class="btn-secondary btn-sm"><i class="fa-solid fa-rotate-right"></i> Rotate All</button>
+      </div>
+    </div>
+
+    <!-- Config: Rotate -->
+    <div id="tpl-rotate">
+      <p class="config-desc">Below, click the rotation buttons to rotate individual pages, or rotate all pages at once.</p>
+      <div class="form-group">
+        <button id="btn-rotate-all-right" class="btn-secondary btn-sm"><i class="fa-solid fa-rotate-right"></i> Rotate All Right</button>
+        <button id="btn-rotate-all-left" class="btn-secondary btn-sm"><i class="fa-solid fa-rotate-left"></i> Rotate All Left</button>
+      </div>
+    </div>
+
+    <!-- Config: Remove Pages -->
+    <div id="tpl-remove">
+      <p class="config-desc">Select the pages you wish to remove from the document.</p>
+      <div class="form-group">
+        <button id="btn-remove-selected" class="btn-secondary btn-sm" style="color:var(--danger); border-color:var(--danger);"><i class="fa-solid fa-trash-can"></i> Remove Selected Pages</button>
+      </div>
+    </div>
+
+    <!-- Config: Extract Pages -->
+    <div id="tpl-extract">
+      <p class="config-desc">Select the pages you wish to extract into a new PDF document.</p>
+      <div class="form-group">
+        <button id="btn-extract-selected" class="btn-primary btn-sm"><i class="fa-solid fa-file-export"></i> Extract Selected Pages</button>
+      </div>
+    </div>
+
+    <!-- Config: Extract Images -->
+    <div id="tpl-extract-images">
+      <p class="config-desc">Extract all embedded images from a PDF and save them as a ZIP archive.</p>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="extract-img-hq" checked>
+        <label for="extract-img-hq">Attempt High Quality Extraction</label>
+      </div>
+    </div>
+
+    <!-- Config: Compress -->
+    <div id="tpl-compress">
+      <div class="form-group">
+        <label>Compression Level</label>
+        <div class="radio-card-group">
+          <label class="radio-card">
+            <input type="radio" name="compress-level" value="low" checked>
+            <div class="radio-card-content">
+              <strong>Low Compression</strong>
+              <span>High visual quality, larger file size.</span>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="compress-level" value="medium">
+            <div class="radio-card-content">
+              <strong>Recommended Compression</strong>
+              <span>Good quality, optimized file size.</span>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="compress-level" value="high">
+            <div class="radio-card-content">
+              <strong>Extreme Compression</strong>
+              <span>Lower quality, smallest file size.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Config: OCR -->
+    <div id="tpl-ocr">
+      <div class="form-group">
+        <label for="ocr-lang">Language for OCR</label>
+        <select id="ocr-lang" class="form-select">
+          <option value="eng">English</option>
+          <option value="ind">Indonesian</option>
+          <option value="spa">Spanish</option>
+          <option value="fra">French</option>
+          <option value="deu">German</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Output Format</label>
+        <span class="info-block">The OCR process will extract text content from the pages, and embed it as a searchable text layer in the output PDF file.</span>
+      </div>
+    </div>
+
+    <!-- Config: JPG to PDF -->
+    <div id="tpl-jpg-to-pdf">
+      <div class="form-group">
+        <label for="jpg-page-orientation">Page Orientation</label>
+        <select id="jpg-page-orientation" class="form-select">
+          <option value="portrait">Portrait (Auto)</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="jpg-page-margin">Page Margin</label>
+        <select id="jpg-page-margin" class="form-select">
+          <option value="none">No Margin</option>
+          <option value="small">Small Margin (20px)</option>
+          <option value="large">Large Margin (50px)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Config: PDF to JPG -->
+    <div id="tpl-pdf-to-jpg">
+      <div class="form-group">
+        <label>Export Mode</label>
+        <div class="radio-card-group">
+          <label class="radio-card">
+            <input type="radio" name="pdf-to-jpg-mode" value="pages" checked>
+            <div class="radio-card-content">
+              <strong>Convert Entire Pages</strong>
+              <span>Every PDF page will be rendered as a JPG.</span>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="pdf-to-jpg-mode" value="images">
+            <div class="radio-card-content">
+              <strong>Extract Images</strong>
+              <span>Only extract embedded images from the PDF.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="jpg-quality">Image Quality (DPI/Resolution)</label>
+        <select id="jpg-quality" class="form-select">
+          <option value="1">Standard (150 DPI)</option>
+          <option value="2" selected>High (300 DPI)</option>
+          <option value="0.5">Draft (75 DPI)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Config: PDF to Text -->
+    <div id="tpl-pdf-to-text">
+      <p class="config-desc">Converts all text fields in your PDF to plain text format (.txt).</p>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="txt-include-pagenums" checked>
+        <label for="txt-include-pagenums">Include Page Dividers (e.g. --- Page 1 ---)</label>
+      </div>
+    </div>
+
+    <!-- Config: HTML to PDF -->
+    <div id="tpl-html-to-pdf">
+      <div class="form-group">
+        <label for="html-source-input">Write Text or HTML Code</label>
+        <textarea id="html-source-input" class="form-textarea" rows="8" placeholder="Type text or HTML code here..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="html-page-size">Page Size</label>
+        <select id="html-page-size" class="form-select">
+          <option value="a4">A4 (210 x 297mm)</option>
+          <option value="letter">US Letter (8.5 x 11in)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Config: Edit PDF -->
+    <div id="tpl-edit">
+      <p class="config-desc">Use the visual editor to add elements to the PDF. Your tools are available in the editor toolbar above the document.</p>
+      
+      <div class="form-group" id="edit-props-panel" style="display:none;">
+        <label>Element Properties</label>
+        
+        <div id="edit-text-props" style="display:none; flex-direction:column; gap:8px;">
+          <input type="color" id="edit-text-color" class="form-color" value="#000000">
+          <input type="number" id="edit-text-size" class="form-control" value="16" min="8" max="72" title="Font Size">
+        </div>
+        
+        <button id="btn-edit-delete" class="btn-secondary w-100 mt-2" style="margin-top:10px; color:var(--danger); border-color:var(--danger);">
+          <i class="fa-solid fa-trash-can"></i> Delete Selected
+        </button>
+      </div>
+      
+      <div class="form-group mt-3" style="margin-top:16px;">
+        <div class="info-block italic text-center" id="edit-status">No elements added yet.</div>
+      </div>
+    </div>
+
+    <!-- Config: Watermark -->
+    <div id="tpl-watermark">
+      <div class="form-group">
+        <label for="wm-text">Watermark Text</label>
+        <input type="text" id="wm-text" class="form-control" value="CONFIDENTIAL">
+      </div>
+      <div class="form-group">
+        <label for="wm-color">Color</label>
+        <input type="color" id="wm-color" class="form-color" value="#ff0000">
+      </div>
+      <div class="row-flex">
+        <div class="form-group flex-1">
+          <label for="wm-opacity">Opacity</label>
+          <input type="range" id="wm-opacity" min="0.1" max="1" step="0.05" class="form-range" value="0.3">
+        </div>
+        <div class="form-group flex-1">
+          <label for="wm-rotation">Rotation (deg)</label>
+          <input type="number" id="wm-rotation" class="form-control" value="45">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="wm-layout">Layout</label>
+        <select id="wm-layout" class="form-select">
+          <option value="center">Center of the page</option>
+          <option value="diagonal">Full Diagonal Grid</option>
+          <option value="bottom-right">Bottom Right Corner</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Config: Page Numbers -->
+    <div id="tpl-page-numbers">
+      <div class="form-group">
+        <label for="pn-format">Format</label>
+        <select id="pn-format" class="form-select">
+          <option value="simple">Page X</option>
+          <option value="detailed">Page X of Y</option>
+          <option value="dash">- X -</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="pn-position">Position</label>
+        <select id="pn-position" class="form-select">
+          <option value="bottom-center">Bottom Center</option>
+          <option value="bottom-right">Bottom Right</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="top-center">Top Center</option>
+          <option value="top-right">Top Right</option>
+        </select>
+      </div>
+      <div class="row-flex">
+        <div class="form-group flex-1">
+          <label for="pn-start">Start Page</label>
+          <input type="number" id="pn-start" class="form-control" value="1" min="1">
+        </div>
+        <div class="form-group flex-1">
+          <label for="pn-font-size">Font Size</label>
+          <input type="number" id="pn-font-size" class="form-control" value="10" min="6" max="24">
+        </div>
+      </div>
+    </div>
+
+    <!-- Config: Sign -->
+    <div id="tpl-sign">
+      <p class="config-desc">Add signatures or initials to documents visually. You will design your signature, then place it interactively.</p>
+      <div class="form-group">
+        <button id="btn-open-sign-pad" class="btn-secondary w-100">
+          <i class="fa-solid fa-signature"></i> Create & Place Signature
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Selected Signatures</label>
+        <div id="signature-stamp-status" class="info-block italic text-center">No signatures created yet.</div>
+      </div>
+    </div>
+
+    <!-- Config: Protect -->
+    <div id="tpl-protect">
+      <div class="form-group">
+        <label for="protect-password">Set Document Password</label>
+        <input type="password" id="protect-password" class="form-control" placeholder="Enter password...">
+      </div>
+      <div class="form-group">
+        <label for="protect-confirm">Confirm Password</label>
+        <input type="password" id="protect-confirm" class="form-control" placeholder="Re-enter password...">
+      </div>
+      <div class="form-group">
+        <label>Security Level</label>
+        <span class="info-block">Uses 128-bit RC4 encryption to secure the document from unauthorized access.</span>
+      </div>
+    </div>
+
+    <!-- Config: Unlock -->
+    <div id="tpl-unlock">
+      <div class="form-group">
+        <label for="unlock-password">Password to Decrypt</label>
+        <input type="password" id="unlock-password" class="form-control" placeholder="Enter password if required...">
+        <span class="form-hint">Leave blank if the document can be unlocked automatically by removing restrictions.</span>
+      </div>
+    </div>
+
+    <!-- Config: AI Summarizer -->
+    <div id="tpl-ai-summarizer">
+      <div class="form-group">
+        <label for="ai-summary-length">Summary Detail</label>
+        <select id="ai-summary-length" class="form-select">
+          <option value="brief">Brief Bullet Points (1-2 sentences)</option>
+          <option value="standard" selected>Standard Summary (1 page)</option>
+          <option value="detailed">Detailed Executive Analysis</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Extracted Text Preview</label>
+        <textarea id="ai-text-preview" class="form-textarea" rows="4" readonly placeholder="Text will be extracted automatically from PDF..."></textarea>
+      </div>
+      <div class="form-group" id="ai-summary-result-box" style="display: none;">
+        <label>AI Summary Output</label>
+        <div id="ai-summary-result" class="ai-output-box"></div>
+      </div>
+    </div>
+
+    <!-- Config: Translate -->
+    <div id="tpl-translate">
+      <div class="form-group">
+        <label for="translate-lang">Target Language</label>
+        <select id="translate-lang" class="form-select">
+          <option value="Indonesian">Indonesian</option>
+          <option value="English">English</option>
+          <option value="Spanish">Spanish</option>
+          <option value="French">French</option>
+          <option value="German">German</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Chinese">Chinese (Simplified)</option>
+        </select>
+      </div>
+      <div class="form-group" id="ai-translate-result-box" style="display: none;">
+        <label>Translated Document Output</label>
+        <div id="ai-translate-result" class="ai-output-box"></div>
+      </div>
+    </div>
+
+    <!-- Config: Pages Per Sheet -->
+    <div id="tpl-pages-per-sheet">
+      <div class="form-group">
+        <label for="pps-count">Pages Per Sheet</label>
+        <select id="pps-count" class="form-select">
+          <option value="2">2 pages per sheet</option>
+          <option value="3">3 pages per sheet</option>
+          <option value="4" selected>4 pages per sheet</option>
+          <option value="6">6 pages per sheet</option>
+          <option value="8">8 pages per sheet</option>
+          <option value="9">9 pages per sheet</option>
+          <option value="12">12 pages per sheet</option>
+          <option value="16">16 pages per sheet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="pps-page-size">Output Page Size</label>
+        <select id="pps-page-size" class="form-select">
+          <option value="a4" selected>A4 (210 × 297 mm)</option>
+          <option value="letter">US Letter (8.5 × 11 in)</option>
+          <option value="a3">A3 (297 × 420 mm)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="pps-orientation">Orientation</label>
+        <select id="pps-orientation" class="form-select">
+          <option value="auto" selected>Auto (best fit)</option>
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </div>
+      <div class="row-flex">
+        <div class="form-group flex-1">
+          <label for="pps-margin">Margin (%)</label>
+          <input type="number" id="pps-margin" class="form-control" value="0" min="0" max="15">
+        </div>
+        <div class="form-group flex-1">
+          <label for="pps-direction">Reading Direction</label>
+          <select id="pps-direction" class="form-select">
+            <option value="ltr" selected>Left to Right (LTR)</option>
+            <option value="rtl">Right to Left (RTL)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="pps-borders">
+        <label for="pps-borders">Add Page Borders</label>
+      </div>
+    </div>
+    
+    <!-- Config: Flatten PDF -->
+    <div id="tpl-flatten-pdf">
+      <p class="config-desc">Flattening a PDF converts all fillable form fields into regular, static text so they can no longer be edited.</p>
+    </div>
+
+    <!-- Config: Edit Metadata -->
+    <div id="tpl-edit-metadata">
+      <div class="form-group">
+        <label for="meta-title">Title</label>
+        <input type="text" id="meta-title" class="form-control" placeholder="Leave blank to keep original">
+      </div>
+      <div class="form-group">
+        <label for="meta-author">Author</label>
+        <input type="text" id="meta-author" class="form-control" placeholder="Leave blank to keep original">
+      </div>
+      <div class="form-group">
+        <label for="meta-subject">Subject</label>
+        <input type="text" id="meta-subject" class="form-control" placeholder="Leave blank to keep original">
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="meta-clear-all">
+        <label for="meta-clear-all" style="color:var(--danger)">Clear all metadata entirely (Privacy Mode)</label>
+      </div>
+    </div>
+
+    <!-- Config: Crop PDF -->
+    <div id="tpl-crop-pdf">
+      <p class="config-desc">Automatically crop white margins from your PDF pages.</p>
+      <div class="form-group">
+        <label for="crop-amount">Crop Margin Size (px)</label>
+        <input type="number" id="crop-amount" class="form-control" value="20" min="0" max="200">
+      </div>
+    </div>
+
+    <!-- Config: Change Page Size -->
+    <div id="tpl-change-page-size">
+      <div class="form-group">
+        <label for="cps-size">New Target Size</label>
+        <select id="cps-size" class="form-select">
+          <option value="a4" selected>A4 (210 x 297mm)</option>
+          <option value="letter">Letter (8.5 x 11in)</option>
+          <option value="a3">A3 (297 x 420mm)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Scaling Mode</label>
+        <div class="radio-card-group">
+          <label class="radio-card">
+            <input type="radio" name="cps-scale" value="fit" checked>
+            <div class="radio-card-content">
+              <strong>Fit to Page</strong>
+              <span>Scale page proportionally to fit inside new size.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End Tool Configs -->
+
+  <!-- Main JavaScript modules -->
+  <script src="pdf-tools.js"></script>
+  <script src="signature-pad-modal.js"></script>
+  <script src="pdf-editor.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
