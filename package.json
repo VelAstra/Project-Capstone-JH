@@ -1,7 +1,7 @@
 {
   "name": "omnipdf-studio",
   "productName": "OmniPDF Studio",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "100% Client-Side Offline Multiplatform PDF Suite (Windows, Linux, macOS, Android)",
   "scripts": {
     "prepare:dist": "node scripts/prepare-dist.js",
