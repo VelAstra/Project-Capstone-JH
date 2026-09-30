@@ -27,15 +27,15 @@
 
 ## 📥 Unduh Installer Aplikasi Langsung (Siap Pakai Tanpa CLI)
 
-Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh berkas yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.2.6](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.6):
+Pengguna tidak perlu menjalankan perintah terminal ataupun instalasi environment yang rumit. Cukup unduh berkas yang sesuai dengan sistem operasi Anda dari [GitHub Releases v1.2.7](https://github.com/VelAstra/Project-Capstone-JH/releases/tag/v1.2.7):
 
 | Platform | Format Berkas | Ukuran | Arsitektur Runtime | Tautan Unduhan Langsung |
 | :--- | :--- | :--- | :--- | :--- |
-| 🪟 **Windows** | `.exe` (Single File) | **~3.12 MB** | Native Microsoft Edge WebView2 (.NET) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.6/OmniPDF-Studio-Windows-x64.exe) |
-| 🍎 **macOS** | `.dmg` | **~4.46 MB** | Tauri v2 + Apple WKWebView | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.6/OmniPDF-Studio-macOS.dmg) |
-| 📱 **Android** | `.apk` | **~5.67 MB** | Android System WebView (Capacitor) | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.6/OmniPDF-Studio-Android.apk) |
-| 🐧 **Linux** | `.deb` (Debian/Ubuntu) | **~2.90 MB** | Tauri v2 + System WebKitGTK 4.1 | [Unduh OmniPDF-Studio-Linux.deb](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.6/OmniPDF-Studio-Linux.deb) |
-| 📄 **Dokumentasi** | `.pdf` (LaTeX) | **~0.19 MB** | Laporan Rekayasa & Arsitektur IEEE | [Unduh OmniPDF-Studio-Technical-Report.pdf](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.6/OmniPDF-Studio-Technical-Report.pdf) |
+| 🪟 **Windows** | `.exe` (Single File) | **~3.12 MB** | Native Microsoft Edge WebView2 (.NET) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.7/OmniPDF-Studio-Windows-x64.exe) |
+| 🍎 **macOS** | `.dmg` | **~4.46 MB** | Tauri v2 + Apple WKWebView | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.7/OmniPDF-Studio-macOS.dmg) |
+| 📱 **Android** | `.apk` | **~5.67 MB** | Android System WebView (Capacitor) | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.7/OmniPDF-Studio-Android.apk) |
+| 🐧 **Linux** | `.deb` (Debian/Ubuntu) | **~2.90 MB** | Tauri v2 + System WebKitGTK 4.1 | [Unduh OmniPDF-Studio-Linux.deb](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.7/OmniPDF-Studio-Linux.deb) |
+| 📄 **Dokumentasi** | `.pdf` (LaTeX) | **~0.24 MB** | Laporan Rekayasa IEEE (10 Halaman Lengkap) | [Unduh OmniPDF-Studio-Technical-Report.pdf](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.2.7/OmniPDF-Studio-Technical-Report.pdf) |
 
 ---
 
