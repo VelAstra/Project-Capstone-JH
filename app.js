@@ -1,14 +1,72 @@
 /* Application Orchestrator - OmniPDF Studio */
-// Global state
+
+// 1. Centralized Application Configuration & Constants
+const APP_CONFIG = {
+  APP_NAME: 'OmniPDF Studio',
+  STORAGE_KEYS: {
+    THEME: 'omnipdf_theme',
+    PREFER_GEMINI: 'omnipdf_prefer_gemini',
+    GEMINI_KEY: 'omnipdf_gemini_key',
+    OPENAI_KEY: 'omnipdf_openai_key',
+    PROCESSED_COUNT: 'omnipdf_stats_processed'
+  },
+  MIME_TYPES: {
+    PDF: 'application/pdf',
+    ZIP: 'application/zip',
+    TEXT: 'text/plain',
+    JPEG: 'image/jpeg',
+    PNG: 'image/png'
+  },
+  AI: {
+    GEMINI_ENDPOINT: (key) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+    OPENAI_ENDPOINT: 'https://api.openai.com/v1/chat/completions',
+    DEFAULT_OPENAI_MODEL: 'gpt-4o-mini'
+  },
+  TOOL_GROUPS: {
+    VISUAL: new Set(['organize', 'rotate', 'remove', 'extract', 'edit', 'sign']),
+    MULTI_INPUT: new Set(['merge', 'jpg-to-pdf']),
+    NO_UPLOAD: new Set(['html-to-pdf'])
+  }
+};
+
+// 2. Safe Storage Wrapper with Backward Compatibility
+const storage = {
+  getTheme: () => localStorage.getItem(APP_CONFIG.STORAGE_KEYS.THEME) || localStorage.getItem('app-theme') || 'dark',
+  setTheme: (t) => { localStorage.setItem(APP_CONFIG.STORAGE_KEYS.THEME, t); localStorage.setItem('app-theme', t); },
+  getStats: () => parseInt(localStorage.getItem(APP_CONFIG.STORAGE_KEYS.PROCESSED_COUNT) || localStorage.getItem('stats-processed') || '0', 10),
+  setStats: (c) => { localStorage.setItem(APP_CONFIG.STORAGE_KEYS.PROCESSED_COUNT, c); localStorage.setItem('stats-processed', c); },
+  getPreferGemini: () => (localStorage.getItem(APP_CONFIG.STORAGE_KEYS.PREFER_GEMINI) ?? localStorage.getItem('prefer-gemini')) !== 'false',
+  setPreferGemini: (v) => { localStorage.setItem(APP_CONFIG.STORAGE_KEYS.PREFER_GEMINI, v); localStorage.setItem('prefer-gemini', v); },
+  getGeminiKey: () => localStorage.getItem(APP_CONFIG.STORAGE_KEYS.GEMINI_KEY) || localStorage.getItem('gemini-key') || '',
+  setGeminiKey: (k) => { localStorage.setItem(APP_CONFIG.STORAGE_KEYS.GEMINI_KEY, k); localStorage.setItem('gemini-key', k); },
+  getOpenaiKey: () => localStorage.getItem(APP_CONFIG.STORAGE_KEYS.OPENAI_KEY) || localStorage.getItem('openai-key') || '',
+  setOpenaiKey: (k) => { localStorage.setItem(APP_CONFIG.STORAGE_KEYS.OPENAI_KEY, k); localStorage.setItem('openai-key', k); }
+};
+
+// 3. Global state
 let activeTab = 'dashboard';
 let uploadedFiles = [];
 let currentFileToProcess = null;
 let processedFileBytes = null;
 let processedFileName = '';
-let processedFileType = 'application/pdf';
+let processedFileType = APP_CONFIG.MIME_TYPES.PDF;
 let pagesState = []; // For Organize PDF [{ originalIndex, rotation }]
 let activeSignatureDataUrl = null;
 let signaturePlacement = null; // For Sign PDF coordinates
+
+// 4. Shared String & Processing Helpers
+function getBaseFilename(file, fallback = 'document') {
+  if (!file || !file.name) return fallback;
+  return file.name.replace(/\.[^/.]+$/, "");
+}
+
+function completeProcessing(bytes, filename, mimeType = APP_CONFIG.MIME_TYPES.PDF, savings = null) {
+  processedFileBytes = bytes;
+  processedFileName = filename;
+  processedFileType = mimeType;
+  updateProgress(100, "Finished");
+  showResultPanel(processedFileName, bytes.length, savings);
+}
 
 // UI Elements mapping
 const views = {
@@ -294,37 +352,29 @@ function setupConfigHandlers() {
 }
 
 /* Theme Management */
-function initTheme() {
-  const currentTheme = localStorage.getItem('app-theme') || 'dark';
-  if (currentTheme === 'light') {
-    document.body.classList.remove('dark-theme');
-    document.body.classList.add('light-theme');
-    elements.themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
-  }
+function applyTheme(theme) {
+  const isLight = theme === 'light';
+  document.body.classList.toggle('light-theme', isLight);
+  document.body.classList.toggle('dark-theme', !isLight);
+  elements.themeToggle.innerHTML = `<i class="fa-solid ${isLight ? 'fa-moon' : 'fa-sun'}"></i>`;
+  storage.setTheme(theme);
+}
 
+function initTheme() {
+  applyTheme(storage.getTheme());
   elements.themeToggle.addEventListener('click', () => {
-    if (document.body.classList.contains('dark-theme')) {
-      document.body.classList.remove('dark-theme');
-      document.body.classList.add('light-theme');
-      elements.themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
-      localStorage.setItem('app-theme', 'light');
-    } else {
-      document.body.classList.remove('light-theme');
-      document.body.classList.add('dark-theme');
-      elements.themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-      localStorage.setItem('app-theme', 'dark');
-    }
+    const isDark = document.body.classList.contains('dark-theme');
+    applyTheme(isDark ? 'light' : 'dark');
   });
 }
 
 /* Stats Management */
 function initStats() {
-  let count = parseInt(localStorage.getItem('stats-processed') || '0', 10);
-  elements.statFilesProcessed.textContent = count;
+  elements.statFilesProcessed.textContent = storage.getStats();
 }
 function incrementStats() {
-  let count = parseInt(localStorage.getItem('stats-processed') || '0', 10) + 1;
-  localStorage.setItem('stats-processed', count);
+  const count = storage.getStats() + 1;
+  storage.setStats(count);
   elements.statFilesProcessed.textContent = count;
 }
 
@@ -387,7 +437,7 @@ function handleSelectedFiles(filesList) {
   }
 
   // Handle constraints (merge and jpg-to-pdf allow multiple files; others require exactly 1)
-  const isMultiple = activeTab === 'merge' || activeTab === 'jpg-to-pdf';
+  const isMultiple = APP_CONFIG.TOOL_GROUPS.MULTI_INPUT.has(activeTab);
   if (isMultiple) {
     uploadedFiles = [...uploadedFiles, ...validFiles];
   } else {
@@ -398,12 +448,7 @@ function handleSelectedFiles(filesList) {
   validateProcessButton();
   hideResultPanel();
 
-  const visualTools = ['organize', 'rotate', 'remove', 'extract', 'sign', 'edit'];
-  if (visualTools.includes(activeTab)) {
-    elements.btnProcess.disabled = true;
-  } else {
-    elements.btnProcess.disabled = false;
-  }
+  elements.btnProcess.disabled = APP_CONFIG.TOOL_GROUPS.VISUAL.has(activeTab);
   
   // Auto-trigger visual layouts if file exists
   if (['organize', 'rotate', 'remove', 'extract'].includes(activeTab) && uploadedFiles.length > 0) {
@@ -481,21 +526,13 @@ function clearFiles() {
 }
 
 function validateProcessButton() {
-  if (activeTab === 'html-to-pdf') {
+  if (APP_CONFIG.TOOL_GROUPS.NO_UPLOAD.has(activeTab)) {
     elements.btnProcess.removeAttribute('disabled');
     return;
   }
 
   const fileCount = uploadedFiles.length;
-  let isValid = false;
-
-  if (activeTab === 'merge') {
-    isValid = fileCount >= 2;
-  } else if (activeTab === 'jpg-to-pdf') {
-    isValid = fileCount >= 1;
-  } else {
-    isValid = fileCount >= 1;
-  }
+  const isValid = activeTab === 'merge' ? fileCount >= 2 : fileCount >= 1;
 
   if (isValid) {
     elements.btnProcess.removeAttribute('disabled');
@@ -834,10 +871,9 @@ function bindDraggableSignature() {
 /* Settings and API Keys */
 function initSettings() {
   elements.btnSettings.addEventListener('click', () => {
-    // Fill values
-    document.getElementById('gemini-api-key').value = localStorage.getItem('gemini-key') || '';
-    document.getElementById('openai-api-key').value = localStorage.getItem('openai-key') || '';
-    document.getElementById('prefer-gemini').checked = localStorage.getItem('prefer-gemini') !== 'false';
+    document.getElementById('gemini-api-key').value = storage.getGeminiKey();
+    document.getElementById('openai-api-key').value = storage.getOpenaiKey();
+    document.getElementById('prefer-gemini').checked = storage.getPreferGemini();
     elements.settingsModal.style.display = 'flex';
   });
 
@@ -850,9 +886,9 @@ function initSettings() {
     const openaiKey = document.getElementById('openai-api-key').value.trim();
     const preferGemini = document.getElementById('prefer-gemini').checked;
 
-    localStorage.setItem('gemini-key', geminiKey);
-    localStorage.setItem('openai-key', openaiKey);
-    localStorage.setItem('prefer-gemini', preferGemini ? 'true' : 'false');
+    storage.setGeminiKey(geminiKey);
+    storage.setOpenaiKey(openaiKey);
+    storage.setPreferGemini(preferGemini ? 'true' : 'false');
 
     elements.settingsModal.style.display = 'none';
     alert("Settings saved successfully.");
@@ -887,7 +923,7 @@ function resetProgress() {
 /* Result panel handlers */
 
 function showResultPanel(filename, bytesCount, savingsPercent = null) {
-  if (uploadedFiles.length > 1 && !['merge', 'jpg-to-pdf'].includes(activeTab) && !['organize', 'rotate', 'remove', 'extract', 'edit', 'sign'].includes(activeTab) && filename !== `Batch_Processed_${uploadedFiles.length}_Files.zip`) {
+  if (uploadedFiles.length > 1 && !APP_CONFIG.TOOL_GROUPS.MULTI_INPUT.has(activeTab) && !APP_CONFIG.TOOL_GROUPS.VISUAL.has(activeTab) && filename !== `Batch_Processed_${uploadedFiles.length}_Files.zip`) {
     // In batch mode, skip showing individual results
     return;
   }
@@ -934,7 +970,7 @@ function downloadResult() {
 async function processActiveTool() {
   hideResultPanel();
   
-  if (uploadedFiles.length === 0 && activeTab !== 'html-to-pdf') {
+  if (uploadedFiles.length === 0 && !APP_CONFIG.TOOL_GROUPS.NO_UPLOAD.has(activeTab)) {
     alert("Please select files first.");
     return;
   }
@@ -942,8 +978,8 @@ async function processActiveTool() {
   showProgress("Processing");
 
   try {
-    const isVisualTool = ['organize', 'rotate', 'remove', 'extract', 'edit', 'sign'].includes(activeTab);
-    const isBatchSupport = uploadedFiles.length > 1 && !isVisualTool && activeTab !== 'html-to-pdf' && activeTab !== 'merge' && activeTab !== 'jpg-to-pdf';
+    const isVisualTool = APP_CONFIG.TOOL_GROUPS.VISUAL.has(activeTab);
+    const isBatchSupport = uploadedFiles.length > 1 && !isVisualTool && !APP_CONFIG.TOOL_GROUPS.NO_UPLOAD.has(activeTab) && !APP_CONFIG.TOOL_GROUPS.MULTI_INPUT.has(activeTab);
 
     if (isBatchSupport) {
       updateProgress(5, "Initializing Batch Process");
@@ -975,12 +1011,7 @@ async function processActiveTool() {
       
       updateProgress(95, "Zipping all results...");
       const zipBytes = await zip.generateAsync({ type: 'uint8array' });
-      processedFileBytes = zipBytes;
-      processedFileName = `Batch_Processed_${total}_Files.zip`;
-      processedFileType = 'application/zip';
-      
-      updateProgress(100, "Finished Batch Processing");
-      showResultPanel(processedFileName, zipBytes.length);
+      completeProcessing(zipBytes, `Batch_Processed_${total}_Files.zip`, APP_CONFIG.MIME_TYPES.ZIP);
 
     } else {
       // Single file or tools that inherently handle multiple files (merge, jpg-to-pdf, etc.)
@@ -999,37 +1030,40 @@ async function processActiveTool() {
   }
 }
 
+const TOOL_ACTIONS = {
+  merge: () => runMerge(),
+  split: () => runSplit(),
+  organize: () => runOrganize(),
+  rotate: () => runRotate(),
+  remove: () => runRemove(),
+  extract: () => runExtract(),
+  'extract-images': () => runExtractImages(),
+  compress: () => runCompress(),
+  ocr: () => runOcr(),
+  'jpg-to-pdf': () => runJpgToPdf(),
+  'ppt-to-pdf': () => runPptToPdf(),
+  'pdf-to-jpg': () => runPdfToJpg(),
+  'pdf-to-text': () => runPdfToText(),
+  'html-to-pdf': () => runHtmlToPdf(),
+  watermark: () => runWatermark(),
+  'page-numbers': () => runPageNumbers(),
+  sign: () => runSign(),
+  protect: () => runProtect(),
+  unlock: () => runUnlock(),
+  'ai-summarizer': () => runAiSummarizer(),
+  translate: () => runTranslate(),
+  'pages-per-sheet': () => runPagesPerSheet(),
+  edit: () => runEdit(),
+  'flatten-pdf': () => runFlattenPdf(),
+  'edit-metadata': () => runEditMetadata(),
+  'crop-pdf': () => runCropPdf(),
+  'change-page-size': () => runChangePageSize()
+};
+
 async function executeToolAction() {
-  switch (activeTab) {
-    case 'merge': await runMerge(); break;
-    case 'split': await runSplit(); break;
-    case 'organize': await runOrganize(); break;
-    case 'rotate': await runRotate(); break;
-    case 'remove': await runRemove(); break;
-    case 'extract': await runExtract(); break;
-    case 'extract-images': await runExtractImages(); break;
-    case 'compress': await runCompress(); break;
-    case 'ocr': await runOcr(); break;
-    case 'jpg-to-pdf': await runJpgToPdf(); break;
-    case 'ppt-to-pdf': await runPptToPdf(); break;
-    case 'pdf-to-jpg': await runPdfToJpg(); break;
-    case 'pdf-to-text': await runPdfToText(); break;
-    case 'html-to-pdf': await runHtmlToPdf(); break;
-    case 'watermark': await runWatermark(); break;
-    case 'page-numbers': await runPageNumbers(); break;
-    case 'sign': await runSign(); break;
-    case 'protect': await runProtect(); break;
-    case 'unlock': await runUnlock(); break;
-    case 'ai-summarizer': await runAiSummarizer(); break;
-    case 'translate': await runTranslate(); break;
-    case 'pages-per-sheet': await runPagesPerSheet(); break;
-    case 'edit': await runEdit(); break;
-    case 'flatten-pdf': await runFlattenPdf(); break;
-    case 'edit-metadata': await runEditMetadata(); break;
-    case 'crop-pdf': await runCropPdf(); break;
-    case 'change-page-size': await runChangePageSize(); break;
-    default: throw new Error("Unknown tool action triggered.");
-  }
+  const action = TOOL_ACTIONS[activeTab];
+  if (!action) throw new Error(`Unknown tool action triggered: ${activeTab}`);
+  await action();
 }
 
 
@@ -1038,13 +1072,7 @@ async function runMerge() {
   updateProgress(20, "Reading files");
   const bytes = await pdfTools.mergePdfs(uploadedFiles);
   updateProgress(80, "Optimizing");
-  
-  processedFileBytes = bytes;
-  processedFileName = `${uploadedFiles[0].name.replace(/\.[^/.]+$/, "")}_merged.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(uploadedFiles[0])}_merged.pdf`);
 }
 
 /* Action: Split */
@@ -1052,17 +1080,13 @@ async function runSplit() {
   updateProgress(20, "Analyzing page indexes");
   const file = currentFileToProcess || uploadedFiles[0];
   const mode = document.getElementById('split-mode').value;
-  const rangesText = document.getElementById('split-ranges') ? document.getElementById('split-ranges').value : '';
+  const rangesText = document.getElementById('split-ranges')?.value || '';
   
   const results = await pdfTools.splitPdf(file, mode, rangesText);
   
   if (results.length === 1) {
-    processedFileBytes = results[0].bytes;
-    processedFileName = results[0].filename;
-    processedFileType = 'application/pdf';
-    showResultPanel(processedFileName, processedFileBytes.length);
+    completeProcessing(results[0].bytes, results[0].filename);
   } else if (results.length > 1) {
-    // Generate ZIP file using JSZip
     updateProgress(60, "Generating ZIP package");
     const zip = new window.JSZip();
     results.forEach(res => {
@@ -1070,13 +1094,8 @@ async function runSplit() {
     });
     
     const zipBytes = await zip.generateAsync({ type: 'uint8array' });
-    processedFileBytes = zipBytes;
-    processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_split_pages.zip`;
-    processedFileType = 'application/zip';
-    showResultPanel(processedFileName, zipBytes.length);
+    completeProcessing(zipBytes, `${getBaseFilename(file)}_split_pages.zip`, APP_CONFIG.MIME_TYPES.ZIP);
   }
-  
-  updateProgress(100, "Finished");
 }
 
 /* Action: Organize */
@@ -1087,14 +1106,7 @@ async function runOrganize() {
   updateProgress(30, "Compiling pages layout");
   const file = currentFileToProcess || uploadedFiles[0];
   const bytes = await pdfTools.organizePdf(file, pagesState);
-  updateProgress(80, "Writing PDF headers");
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_organized.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_organized.pdf`);
 }
 
 /* Action: Compress */
@@ -1110,27 +1122,18 @@ async function runCompress() {
   
   updateProgress(90, "Re-encoding document objects");
   
-  // Calculate savings
   const originalSize = file.size;
   const newSize = bytes.length;
   const savings = Math.max(0, ((originalSize - newSize) / originalSize) * 100);
   
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_compressed.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length, savings);
+  completeProcessing(bytes, `${getBaseFilename(file)}_compressed.pdf`, APP_CONFIG.MIME_TYPES.PDF, savings);
 }
 
 /* Action: OCR */
 async function runOcr() {
   const file = currentFileToProcess || uploadedFiles[0];
-  const langEl = document.getElementById('ocr-lang');
-  const lang = langEl ? langEl.value : 'eng';
-  
-  const formatEl = document.querySelector('input[name="ocr-output-format"]:checked');
-  const outputFormat = formatEl ? formatEl.value : 'pdf';
+  const lang = document.getElementById('ocr-lang')?.value || 'eng';
+  const outputFormat = document.querySelector('input[name="ocr-output-format"]:checked')?.value || 'pdf';
   
   if (outputFormat === 'pdf') {
     updateProgress(5, "Analyzing PDF layout");
@@ -1143,12 +1146,7 @@ async function runOcr() {
     });
     
     updateProgress(95, "Embedding searchable text layer");
-    processedFileBytes = bytes;
-    processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_searchable.pdf`;
-    processedFileType = 'application/pdf';
-    
-    updateProgress(100, "Searchable PDF Ready");
-    showResultPanel(processedFileName, processedFileBytes.length);
+    completeProcessing(bytes, `${getBaseFilename(file)}_searchable.pdf`);
   } else {
     updateProgress(5, "Extracting text content");
     const ocrText = await pdfTools.ocrPdf(file, lang, (current, total, phase) => {
@@ -1161,12 +1159,7 @@ async function runOcr() {
     
     updateProgress(95, "Compiling recognized text");
     const enc = new TextEncoder();
-    processedFileBytes = enc.encode(ocrText);
-    processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_ocr.txt`;
-    processedFileType = 'text/plain';
-    
-    updateProgress(100, "OCR Done");
-    showResultPanel(processedFileName, processedFileBytes.length);
+    completeProcessing(enc.encode(ocrText), `${getBaseFilename(file)}_ocr.txt`, APP_CONFIG.MIME_TYPES.TEXT);
   }
 }
 
@@ -1177,27 +1170,16 @@ async function runJpgToPdf() {
   const margin = document.getElementById('jpg-page-margin').value;
   
   const bytes = await pdfTools.jpgToPdf(uploadedFiles, orientation, margin);
-  
-  processedFileBytes = bytes;
-  processedFileName = `images_converted.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, 'images_converted.pdf');
 }
-
 
 /* Action: PPT to PDF */
 async function runPptToPdf() {
   const file = currentFileToProcess || uploadedFiles[0];
-  const bytes = await pdfTools.pptxToPdf(file, (curr, total, phase) => {
-    updateProgress((curr / total) * 100, `Converting PPT to PDF...`);
+  const bytes = await pdfTools.pptxToPdf(file, (curr, total) => {
+    updateProgress((curr / total) * 100, "Converting PPT to PDF...");
   });
-  processedFileBytes = bytes;
-  processedFileName = file.name.replace(/\.[^/.]+$/, "") + '_converted.pdf';
-  processedFileType = 'application/pdf';
-  updateProgress(100, "Finished");
-  if (uploadedFiles.length <= 1) showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_converted.pdf`);
 }
 
 /* Action: PDF to JPG */
@@ -1220,13 +1202,7 @@ async function runPdfToJpg() {
   }
   
   const zipBytes = await zip.generateAsync({ type: 'uint8array' });
-  
-  processedFileBytes = zipBytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_images.zip`;
-  processedFileType = 'application/zip';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, zipBytes.length);
+  completeProcessing(zipBytes, `${getBaseFilename(file)}_images.zip`, APP_CONFIG.MIME_TYPES.ZIP);
 }
 
 /* Action: PDF to Text */
@@ -1240,12 +1216,7 @@ async function runPdfToText() {
   });
   
   const enc = new TextEncoder();
-  processedFileBytes = enc.encode(text);
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_extracted.txt`;
-  processedFileType = 'text/plain';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, processedFileBytes.length);
+  completeProcessing(enc.encode(text), `${getBaseFilename(file)}_extracted.txt`, APP_CONFIG.MIME_TYPES.TEXT);
 }
 
 /* Action: HTML to PDF */
@@ -1256,15 +1227,8 @@ async function runHtmlToPdf() {
     throw new Error("Please enter text or HTML source code first.");
   }
   const pageSize = document.getElementById('html-page-size').value;
-  
   const bytes = await pdfTools.htmlToPdf(text, pageSize);
-  
-  processedFileBytes = bytes;
-  processedFileName = `custom_document.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, 'custom_document.pdf');
 }
 
 /* Action: Watermark */
@@ -1279,13 +1243,7 @@ async function runWatermark() {
   const layout = document.getElementById('wm-layout').value;
   
   const bytes = await pdfTools.addWatermark(file, text, color, opacity, rotation, layout);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_watermarked.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_watermarked.pdf`);
 }
 
 /* Action: Page Numbers */
@@ -1298,13 +1256,7 @@ async function runPageNumbers() {
   const fontSize = document.getElementById('pn-font-size').value;
   
   const bytes = await pdfTools.addPageNumbers(file, format, position, startPage, fontSize);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_numbered.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_numbered.pdf`);
 }
 
 /* Action: Sign */
@@ -1332,7 +1284,6 @@ async function runSign() {
   );
 
   updateProgress(65, "Embedding signature stamp");
-  // Fetch stamp bytes
   const response = await fetch(activeSignatureDataUrl);
   const signatureBytes = await response.arrayBuffer();
   
@@ -1346,13 +1297,7 @@ async function runSign() {
   });
 
   const bytes = await pdfDoc.save({ useObjectStreams: true });
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_signed.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_signed.pdf`);
 }
 
 /* Action: Protect */
@@ -1366,13 +1311,7 @@ async function runProtect() {
   
   updateProgress(30, "Encrypting byte streams");
   const bytes = await pdfTools.protectPdf(file, password);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_protected.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_protected.pdf`);
 }
 
 /* Action: Unlock */
@@ -1382,13 +1321,7 @@ async function runUnlock() {
   
   updateProgress(30, "Validating decryption table");
   const bytes = await pdfTools.unlockPdf(file, password);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_unlocked.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_unlocked.pdf`);
 }
 
 /* Action: AI Summarizer */
@@ -1403,27 +1336,19 @@ async function runAiSummarizer() {
   });
   
   document.getElementById('ai-text-preview').value = extractedText;
-  
   updateProgress(55, "Generating summarization");
   
   const summary = await callAiAPI(extractedText, `Summarize the following document. Length setting is: ${length}. Extracted Document content:\n\n${extractedText}`);
   
-  // Display result
   const resultDiv = document.getElementById('ai-summary-result');
   const resultBox = document.getElementById('ai-summary-result-box');
-  
   if (resultDiv && resultBox) {
     resultDiv.textContent = summary;
     resultBox.style.display = 'block';
   }
   
   const enc = new TextEncoder();
-  processedFileBytes = enc.encode(summary);
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_summary.txt`;
-  processedFileType = 'text/plain';
-  
-  updateProgress(100, "Summarized");
-  showResultPanel(processedFileName, processedFileBytes.length);
+  completeProcessing(enc.encode(summary), `${getBaseFilename(file)}_summary.txt`, APP_CONFIG.MIME_TYPES.TEXT);
 }
 
 /* Action: Translate */
@@ -1443,19 +1368,13 @@ async function runTranslate() {
   
   const resultDiv = document.getElementById('ai-translate-result');
   const resultBox = document.getElementById('ai-translate-result-box');
-  
   if (resultDiv && resultBox) {
     resultDiv.textContent = translated;
     resultBox.style.display = 'block';
   }
   
   const enc = new TextEncoder();
-  processedFileBytes = enc.encode(translated);
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_translated_${targetLang.toLowerCase()}.txt`;
-  processedFileType = 'text/plain';
-  
-  updateProgress(100, "Translated");
-  showResultPanel(processedFileName, processedFileBytes.length);
+  completeProcessing(enc.encode(translated), `${getBaseFilename(file)}_translated_${targetLang.toLowerCase()}.txt`, APP_CONFIG.MIME_TYPES.TEXT);
 }
 
 /* Action: Pages Per Sheet */
@@ -1463,19 +1382,11 @@ async function runPagesPerSheet() {
   const file = currentFileToProcess || uploadedFiles[0];
   const count = parseInt(document.getElementById('pps-count').value, 10);
   const pageSize = document.getElementById('pps-page-size').value;
-  
-  const orientationElem = document.getElementById('pps-orientation');
-  const orientation = orientationElem ? orientationElem.value : 'auto';
-  
-  const marginElem = document.getElementById('pps-margin');
-  const marginVal = marginElem ? parseFloat(marginElem.value) : 0;
+  const orientation = document.getElementById('pps-orientation')?.value || 'auto';
+  const marginVal = parseFloat(document.getElementById('pps-margin')?.value);
   const marginPercent = isNaN(marginVal) ? 0 : marginVal;
-  
-  const directionElem = document.getElementById('pps-direction');
-  const direction = directionElem ? directionElem.value : 'ltr';
-  
-  const bordersElem = document.getElementById('pps-borders');
-  const addBorders = bordersElem ? bordersElem.checked : false;
+  const direction = document.getElementById('pps-direction')?.value || 'ltr';
+  const addBorders = document.getElementById('pps-borders')?.checked || false;
 
   updateProgress(15, "Analyzing source PDF pages");
 
@@ -1491,12 +1402,7 @@ async function runPagesPerSheet() {
     updateProgress(percent, `Composing sheet ${current} of ${total}`);
   });
 
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_${count}up.pdf`;
-  processedFileType = 'application/pdf';
-
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_${count}up.pdf`);
 }
 
 /* Stubs for new batch 1 tools */
@@ -1507,13 +1413,7 @@ async function processVisualToolBase(suffix) {
   }
   updateProgress(30, "Processing PDF structure");
   const bytes = await pdfTools.organizePdf(uploadedFiles[0], pagesState);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${uploadedFiles[0].name.replace(/\.[^/.]+$/, "")}_${suffix}.pdf`;
-  processedFileType = 'application/pdf';
-
-  updateProgress(100, "Done");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(uploadedFiles[0])}_${suffix}.pdf`);
 }
 
 /* Action: Flatten PDF */
@@ -1521,13 +1421,7 @@ async function runFlattenPdf() {
   updateProgress(30, "Flattening form fields");
   const file = currentFileToProcess || uploadedFiles[0];
   const bytes = await pdfTools.flattenPdf(file);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_flattened.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Done");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_flattened.pdf`);
 }
 
 /* Action: Edit Metadata */
@@ -1540,13 +1434,7 @@ async function runEditMetadata() {
   const clearAll = document.getElementById('meta-clear-all').checked;
   
   const bytes = await pdfTools.editMetadata(file, title, author, subject, clearAll);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_meta.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Done");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_meta.pdf`);
 }
 
 /* Action: Crop PDF */
@@ -1556,13 +1444,7 @@ async function runCropPdf() {
   const marginSize = document.getElementById('crop-amount').value;
   
   const bytes = await pdfTools.cropPdf(file, marginSize);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_cropped.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Done");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_cropped.pdf`);
 }
 
 /* Action: Change Page Size */
@@ -1573,13 +1455,7 @@ async function runChangePageSize() {
   const scaleMode = document.querySelector('input[name="cps-scale"]:checked').value;
   
   const bytes = await pdfTools.changePageSize(file, targetSize, scaleMode);
-  
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_resized.pdf`;
-  processedFileType = 'application/pdf';
-  
-  updateProgress(100, "Done");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_resized.pdf`);
 }
 
 async function runRotate() {
@@ -1597,26 +1473,21 @@ async function runExtractImages() {
   updateProgress(20, "Scanning PDF for embedded images");
   
   const bytes = await pdfTools.extractImages(file, { hq }, (current, total) => {
-    updateProgress(20 + Math.floor((current/total)*70), `Scanning page ${current} of ${total}`);
+    updateProgress(20 + Math.floor((current / total) * 70), `Scanning page ${current} of ${total}`);
   });
   
-  processedFileBytes = bytes;
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_images.zip`;
-  processedFileType = 'application/zip';
-  
-  updateProgress(100, "Finished");
-  showResultPanel(processedFileName, bytes.length);
+  completeProcessing(bytes, `${getBaseFilename(file)}_images.zip`, APP_CONFIG.MIME_TYPES.ZIP);
 }
 
 /* External API callers */
 async function callAiAPI(text, prompt) {
-  const preferGemini = localStorage.getItem('prefer-gemini') !== 'false';
-  const geminiKey = localStorage.getItem('gemini-key');
-  const openaiKey = localStorage.getItem('openai-key');
+  const preferGemini = storage.getPreferGemini();
+  const geminiKey = storage.getGeminiKey();
+  const openaiKey = storage.getOpenaiKey();
   
   if (preferGemini && geminiKey) {
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+      const response = await fetch(APP_CONFIG.AI.GEMINI_ENDPOINT(geminiKey), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1624,7 +1495,7 @@ async function callAiAPI(text, prompt) {
         })
       });
       const data = await response.json();
-      if (data.candidates && data.candidates[0].content.parts[0].text) {
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
         return data.candidates[0].content.parts[0].text;
       }
       throw new Error(data.error?.message || "Invalid API response schema.");
@@ -1633,19 +1504,19 @@ async function callAiAPI(text, prompt) {
     }
   } else if (!preferGemini && openaiKey) {
     try {
-      const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+      const response = await fetch(APP_CONFIG.AI.OPENAI_ENDPOINT, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${openaiKey}`
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: APP_CONFIG.AI.DEFAULT_OPENAI_MODEL,
           messages: [{ role: "user", content: prompt }]
         })
       });
       const data = await response.json();
-      if (data.choices && data.choices[0].message.content) {
+      if (data.choices?.[0]?.message?.content) {
         return data.choices[0].message.content;
       }
       throw new Error(data.error?.message || "Invalid API response schema.");
@@ -1803,9 +1674,7 @@ async function runEdit() {
   if (!pagesInfo) throw new Error("Missing canvas dimensions. Please reload the page.");
 
   const outputBytes = await pdfTools.applyEditsToPdf(file, editsList, pagesInfo);
-  
-  processedFileBytes = outputBytes;
-  processedFileName = file.name.replace('.pdf', '_edited.pdf');
+  completeProcessing(outputBytes, `${getBaseFilename(file)}_edited.pdf`);
   
   // Clean up
   pdfEditor.teardownEditor();

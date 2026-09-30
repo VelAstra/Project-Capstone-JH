@@ -7,6 +7,28 @@ using Microsoft.Web.WebView2.WinForms;
 
 namespace OmniPdfStudio
 {
+    internal static class AppConstants
+    {
+        public const string AppName = "OmniPDF Studio";
+        public const int WindowWidth = 1280;
+        public const int WindowHeight = 850;
+        public const int MinWindowWidth = 960;
+        public const int MinWindowHeight = 650;
+
+        public const string IconFileName = "icon.ico";
+        public const string VirtualHostName = "omnipdf.local";
+        public const string IndexFileName = "index.html";
+        public const string AppHostUrl = "https://omnipdf.local/index.html";
+
+        public const string LocalDataFolder = "OmniPdfStudio";
+        public const string WebDirName = "web";
+        public const string UserDataDirName = "webview_profile";
+        public const string BundleResourceSuffix = "bundle.zip";
+
+        public const string BrowserArguments = 
+            "--js-flags=\"--max-old-space-size=256 --optimize-for-size\" --disable-features=Autofill,Translate,MediaRouter,OptimizationHints --disk-cache-size=16777216 --disable-component-update --disable-sync";
+    }
+
     static class Program
     {
         [STAThread]
@@ -16,27 +38,26 @@ namespace OmniPdfStudio
             
             var form = new Form
             {
-                Text = "OmniPDF Studio",
-                Width = 1280,
-                Height = 850,
-                MinimumSize = new System.Drawing.Size(960, 650),
+                Text = AppConstants.AppName,
+                Width = AppConstants.WindowWidth,
+                Height = AppConstants.WindowHeight,
+                MinimumSize = new System.Drawing.Size(AppConstants.MinWindowWidth, AppConstants.MinWindowHeight),
                 StartPosition = FormStartPosition.CenterScreen
             };
 
-            var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "icon.ico");
+            var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConstants.IconFileName);
             if (File.Exists(iconPath))
             {
                 form.Icon = new System.Drawing.Icon(iconPath);
             }
             else
             {
-                var parentIcon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "icon.ico");
+                var parentIcon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", AppConstants.IconFileName);
                 if (File.Exists(parentIcon)) form.Icon = new System.Drawing.Icon(parentIcon);
             }
 
             // Hardware and memory optimization flags for WebView2 Chromium runtime
-            Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
-                "--js-flags=\"--max-old-space-size=256 --optimize-for-size\" --disable-features=Autofill,Translate,MediaRouter,OptimizationHints --disk-cache-size=16777216 --disable-component-update --disable-sync");
+            Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", AppConstants.BrowserArguments);
 
             var webView = new WebView2
             {
@@ -52,14 +73,9 @@ namespace OmniPdfStudio
                 {
                     if (webView?.CoreWebView2 != null)
                     {
-                        if (form.WindowState == FormWindowState.Minimized)
-                        {
-                            webView.CoreWebView2.MemoryUsageTargetLevel = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Low;
-                        }
-                        else
-                        {
-                            webView.CoreWebView2.MemoryUsageTargetLevel = Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Normal;
-                        }
+                        webView.CoreWebView2.MemoryUsageTargetLevel = form.WindowState == FormWindowState.Minimized
+                            ? Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Low
+                            : Microsoft.Web.WebView2.Core.CoreWebView2MemoryUsageTargetLevel.Normal;
                     }
                 }
                 catch { }
@@ -67,15 +83,15 @@ namespace OmniPdfStudio
 
             form.Load += async (s, e) =>
             {
-                var omniDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OmniPdfStudio");
-                var appDataDir = Path.Combine(omniDir, "web");
-                var userDataDir = Path.Combine(omniDir, "webview_profile");
+                var omniDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppConstants.LocalDataFolder);
+                var appDataDir = Path.Combine(omniDir, AppConstants.WebDirName);
+                var userDataDir = Path.Combine(omniDir, AppConstants.UserDataDirName);
 
                 // 1. Cleanly extract embedded bundle.zip to appDataDir
                 try
                 {
                     var assembly = Assembly.GetExecutingAssembly();
-                    var resName = Array.Find(assembly.GetManifestResourceNames(), r => r.EndsWith("bundle.zip", StringComparison.OrdinalIgnoreCase));
+                    var resName = Array.Find(assembly.GetManifestResourceNames(), r => r.EndsWith(AppConstants.BundleResourceSuffix, StringComparison.OrdinalIgnoreCase));
                     using var resourceStream = !string.IsNullOrEmpty(resName) ? assembly.GetManifestResourceStream(resName) : null;
 
                     if (resourceStream != null)
@@ -108,33 +124,38 @@ namespace OmniPdfStudio
                 webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
 
                 // 3. Bind virtual host mapping directly to appDataDir (guarantees HTTPS origin and prevents cross-file bleed)
-                var indexPath = Path.Combine(appDataDir, "index.html");
+                var indexPath = Path.Combine(appDataDir, AppConstants.IndexFileName);
                 if (File.Exists(indexPath))
                 {
                     webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
-                        "omnipdf.local",
+                        AppConstants.VirtualHostName,
                         appDataDir,
                         Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow
                     );
-                    webView.Source = new Uri("https://omnipdf.local/index.html");
+                    webView.Source = new Uri(AppConstants.AppHostUrl);
                 }
                 else
                 {
                     // Fallback for debug/development runs directly in repo folder
-                    var devIndex = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "index.html"));
+                    var devIndex = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", AppConstants.IndexFileName));
                     if (File.Exists(devIndex))
                     {
                         var devDir = Path.GetDirectoryName(devIndex)!;
                         webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
-                            "omnipdf.local",
+                            AppConstants.VirtualHostName,
                             devDir,
                             Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow
                         );
-                        webView.Source = new Uri("https://omnipdf.local/index.html");
+                        webView.Source = new Uri(AppConstants.AppHostUrl);
                     }
                     else
                     {
-                        MessageBox.Show("OmniPDF Studio interface bundle could not be found. Please reinstall the application.", "OmniPDF Studio Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(
+                            $"{AppConstants.AppName} interface bundle could not be found. Please reinstall the application.",
+                            $"{AppConstants.AppName} Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
                     }
                 }
             };

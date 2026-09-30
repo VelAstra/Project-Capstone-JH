@@ -1,8 +1,56 @@
 /* Core PDF Processing Functions - OmniPDF Studio */
 
+// 1. Centralized Constants & Configurations
+const PDF_CONSTANTS = {
+  WORKER_SRC: 'assets/libs/pdf.worker.min.js',
+  PAGE_DIMENSIONS: {
+    a4: [595.28, 841.89],
+    letter: [612.0, 792.0],
+    legal: [612.0, 1008.0],
+    a3: [841.89, 1190.55],
+    a5: [419.53, 595.28]
+  },
+  DEFAULT_PAGE_SIZE: 'a4',
+  DEFAULT_FONT_SIZE: 11,
+  DEFAULT_LINE_HEIGHT: 16,
+  DEFAULT_MARGIN: 50,
+  RGB_MAX: 255
+};
+
 // Ensure pdf.js worker is configured
 if (window.pdfjsLib) {
-  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'assets/libs/pdf.worker.min.js';
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_CONSTANTS.WORKER_SRC;
+}
+
+// 2. Shared Utilities & Helpers
+function getBaseName(file, fallback = 'document') {
+  if (!file || !file.name) return fallback;
+  return file.name.replace(/\.[^/.]+$/, "");
+}
+
+function hexToPdfRgb(hexColor, fallback = { r: 0, g: 0, b: 0 }) {
+  if (!hexColor || typeof hexColor !== 'string') return fallback;
+  const cleanHex = hexColor.replace(/^#/, '');
+  if (cleanHex.length === 6) {
+    const r = parseInt(cleanHex.substring(0, 2), 16) / PDF_CONSTANTS.RGB_MAX;
+    const g = parseInt(cleanHex.substring(2, 4), 16) / PDF_CONSTANTS.RGB_MAX;
+    const b = parseInt(cleanHex.substring(4, 6), 16) / PDF_CONSTANTS.RGB_MAX;
+    if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+      return { r, g, b };
+    }
+  }
+  return fallback;
+}
+
+function getPageDimensions(sizeKey, fallback = PDF_CONSTANTS.DEFAULT_PAGE_SIZE) {
+  const key = (sizeKey || fallback).toLowerCase();
+  return PDF_CONSTANTS.PAGE_DIMENSIONS[key] || PDF_CONSTANTS.PAGE_DIMENSIONS[fallback] || PDF_CONSTANTS.PAGE_DIMENSIONS.a4;
+}
+
+async function loadPdfDocument(file) {
+  const { PDFDocument } = window.PDFLib;
+  const arrayBuffer = await file.arrayBuffer();
+  return await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
 }
 
 /**
@@ -15,8 +63,7 @@ async function mergePdfs(filesList) {
   const mergedPdf = await PDFDocument.create();
   
   for (const file of filesList) {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+    const pdf = await loadPdfDocument(file);
     const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
     copiedPages.forEach((page) => mergedPdf.addPage(page));
   }
@@ -33,10 +80,10 @@ async function mergePdfs(filesList) {
  */
 async function splitPdf(file, mode, rangesText) {
   const { PDFDocument } = window.PDFLib;
-  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await loadPdfDocument(file);
+  const baseName = getBaseName(file);
   
   if (mode === 'individual') {
-    const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
     const numPages = pdf.getPageCount();
     const outputs = [];
     
@@ -46,14 +93,13 @@ async function splitPdf(file, mode, rangesText) {
       singlePdf.addPage(copiedPage);
       const bytes = await singlePdf.save({ useObjectStreams: true });
       outputs.push({
-        filename: `${file.name.replace(/\.[^/.]+$/, "")}_page_${i + 1}.pdf`,
+        filename: `${baseName}_page_${i + 1}.pdf`,
         bytes
       });
     }
     return outputs;
   } else {
     // Range mode
-    const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
     const numPages = pdf.getPageCount();
     const splitPdfDoc = await PDFDocument.create();
     
@@ -67,7 +113,7 @@ async function splitPdf(file, mode, rangesText) {
     
     const bytes = await splitPdfDoc.save({ useObjectStreams: true });
     return [{
-      filename: `${file.name.replace(/\.[^/.]+$/, "")}_split.pdf`,
+      filename: `${baseName}_split.pdf`,
       bytes
     }];
   }
@@ -111,9 +157,7 @@ function parseRanges(rangesText, maxPages) {
  */
 async function organizePdf(file, pagesState) {
   const { PDFDocument, degrees } = window.PDFLib;
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-  
+  const pdf = await loadPdfDocument(file);
   const newPdf = await PDFDocument.create();
   
   for (const pageInfo of pagesState) {
@@ -457,7 +501,7 @@ async function pdfToJpg(file, scale, progressCallback) {
       
       const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
       images.push({
-        name: `${file.name.replace(/\.[^/.]+$/, "")}_page_${i}.jpg`,
+        name: `${getBaseName(file)}_page_${i}.jpg`,
         dataUrl
       });
 
@@ -539,18 +583,18 @@ async function htmlToPdf(text, pageSize) {
   const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
   const pdfDoc = await PDFDocument.create();
   
-  const dims = pageSize === 'a4' ? [595.28, 841.89] : [612, 792];
+  const dims = getPageDimensions(pageSize);
   
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   
   let page = pdfDoc.addPage(dims);
-  const margin = 50;
+  const margin = PDF_CONSTANTS.DEFAULT_MARGIN;
   const width = dims[0] - margin * 2;
   
   let currentY = dims[1] - margin;
-  const fontSize = 11;
-  const lineHeight = 16;
+  const fontSize = PDF_CONSTANTS.DEFAULT_FONT_SIZE;
+  const lineHeight = PDF_CONSTANTS.DEFAULT_LINE_HEIGHT;
   
   const lines = text.split('\n');
   
@@ -640,15 +684,11 @@ async function htmlToPdf(text, pageSize) {
  * @returns {Promise<Uint8Array>}
  */
 async function addWatermark(file, text, colorHex, opacity, rotationDeg, layout) {
-  const { PDFDocument, StandardFonts, rgb, degrees } = window.PDFLib;
-  const arrayBuffer = await file.arrayBuffer();
-  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const { StandardFonts, rgb, degrees } = window.PDFLib;
+  const pdfDoc = await loadPdfDocument(file);
   
   const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  
-  const r = parseInt(colorHex.substring(1, 3), 16) / 255;
-  const g = parseInt(colorHex.substring(3, 5), 16) / 255;
-  const b = parseInt(colorHex.substring(5, 7), 16) / 255;
+  const { r, g, b } = hexToPdfRgb(colorHex, { r: 0.8, g: 0, b: 0 });
   const color = rgb(r, g, b);
   
   const pages = pdfDoc.getPages();
@@ -716,9 +756,8 @@ async function addWatermark(file, text, colorHex, opacity, rotationDeg, layout) 
  * @returns {Promise<Uint8Array>}
  */
 async function addPageNumbers(file, format, position, startPage, fontSize) {
-  const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
-  const arrayBuffer = await file.arrayBuffer();
-  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const { StandardFonts, rgb } = window.PDFLib;
+  const pdfDoc = await loadPdfDocument(file);
   
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const pages = pdfDoc.getPages();
@@ -1069,9 +1108,7 @@ async function applyEditsToPdf(file, editsList, pagesInfo) {
     const pdfY = (pInfo.canvasHeight - canvasBottomY) * scaleY;
 
     if (edit.type === 'text') {
-      const r = parseInt(edit.color.substring(1, 3), 16) / 255;
-      const g = parseInt(edit.color.substring(3, 5), 16) / 255;
-      const b = parseInt(edit.color.substring(5, 7), 16) / 255;
+      const { r, g, b } = hexToPdfRgb(edit.color, { r: 0, g: 0, b: 0 });
 
       // The fontSize in canvas pixels needs to be scaled to PDF points
       const scaledFontSize = edit.fontSize * scaleY;
@@ -1240,8 +1277,7 @@ async function flattenPdf(file) {
  * Edit PDF Metadata
  */
 async function editMetadata(file, title, author, subject, clearAll) {
-  const { PDFDocument } = window.PDFLib;
-  const pdfDoc = await PDFDocument.load(await file.arrayBuffer());
+  const pdfDoc = await loadPdfDocument(file);
   
   if (clearAll) {
     pdfDoc.setTitle('');
@@ -1262,14 +1298,13 @@ async function editMetadata(file, title, author, subject, clearAll) {
  * Crop PDF margins
  */
 async function cropPdf(file, marginSize) {
-  const { PDFDocument } = window.PDFLib;
-  const pdfDoc = await PDFDocument.load(await file.arrayBuffer());
+  const pdfDoc = await loadPdfDocument(file);
   const pages = pdfDoc.getPages();
   const cropAmount = parseInt(marginSize, 10);
   
   pages.forEach(page => {
     const { width, height } = page.getSize();
-    page.setCropBox(cropAmount, cropAmount, width - cropAmount*2, height - cropAmount*2);
+    page.setCropBox(cropAmount, cropAmount, width - cropAmount * 2, height - cropAmount * 2);
   });
   return await pdfDoc.save();
 }
@@ -1279,10 +1314,10 @@ async function cropPdf(file, marginSize) {
  */
 async function changePageSize(file, targetSize, scaleMode) {
   const { PDFDocument } = window.PDFLib;
-  const pdfDoc = await PDFDocument.load(await file.arrayBuffer());
+  const pdfDoc = await loadPdfDocument(file);
   const outPdf = await PDFDocument.create();
   
-  const dims = targetSize === 'a4' ? [595.28, 841.89] : targetSize === 'letter' ? [612, 792] : [841.89, 1190.55];
+  const dims = getPageDimensions(targetSize);
   const pages = pdfDoc.getPages();
   
   for (const page of pages) {
@@ -1291,7 +1326,7 @@ async function changePageSize(file, targetSize, scaleMode) {
     const outPage = outPdf.addPage(dims);
     
     // Fit to page
-    const scale = Math.min(dims[0]/width, dims[1]/height);
+    const scale = Math.min(dims[0] / width, dims[1] / height);
     const w = width * scale;
     const h = height * scale;
     
@@ -1311,15 +1346,12 @@ async function changePageSize(file, targetSize, scaleMode) {
  * @returns {Promise<Array<{width: number, height: number}>>}
  */
 async function getPdfPageInfo(file) {
-  const { PDFDocument } = window.PDFLib;
-  const arrayBuffer = await file.arrayBuffer();
-  const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const pdfDoc = await loadPdfDocument(file);
   const pages = pdfDoc.getPages();
-  const info = pages.map(p => {
+  return pages.map(p => {
     const { width, height } = p.getSize();
     return { width, height };
   });
-  return info;
 }
 
 /**
