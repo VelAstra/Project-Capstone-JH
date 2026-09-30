@@ -12,7 +12,8 @@ Pengguna tidak perlu menjalankan terminal atau instalasi rumit. Cukup unduh satu
 
 | Platform | Format Berkas | Tautan Unduhan Langsung | Keterangan |
 | :--- | :--- | :--- | :--- |
-| 🪟 **Windows** | `.exe` (Single File) | [Unduh PDFSuitePro-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/PDFSuitePro-Windows.exe) | Standalone WebView2 Executable, tinggal klik 2x langsung jalan. |
+| 🪟 **Windows** | `.exe` (Full Installer) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows-x64.exe) | Installer lengkap Electron (NSIS & Portable). |
+| 🪟 **Windows (Lite)** | `.exe` (Single File) | [Unduh PDFSuitePro-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/PDFSuitePro-Windows.exe) | Standalone WebView2 Executable (2.9 MB), tinggal klik 2x langsung jalan tanpa install. |
 | 📱 **Android** | `.apk` | [Unduh PDFSuitePro-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/PDFSuitePro-Android.apk) | Berkas paket Android mandiri, langsung install di HP/Tablet. |
 | 🐧 **Linux** | `.AppImage` | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Linux.AppImage) | Format universal Linux portable, cukup beri izin eksekusi (`chmod +x`). |
 | 🍎 **macOS** | `.dmg` | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-macOS.dmg) | Disk image resmi untuk Intel & Apple Silicon (M1/M2/M3/M4). |
