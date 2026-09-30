@@ -21,6 +21,7 @@ pnpm-debug.log*
 dist/
 dist-release/
 dist-android/
+host-publish/
 src-tauri/target/
 dist-web/
 build-dist/
