@@ -371,12 +371,12 @@ function initTheme() {
 
 /* Stats Management */
 function initStats() {
-  elements.statFilesProcessed.textContent = storage.getStats();
+  if (elements.statFilesProcessed) elements.statFilesProcessed.textContent = storage.getStats();
 }
 function incrementStats() {
   const count = storage.getStats() + 1;
   storage.setStats(count);
-  elements.statFilesProcessed.textContent = count;
+  if (elements.statFilesProcessed) elements.statFilesProcessed.textContent = count;
 }
 
 /* Drag & Drop File Uploads */
