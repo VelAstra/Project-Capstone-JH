@@ -19,6 +19,9 @@ pnpm-debug.log*
 # 2. Build Outputs, Installers & Binaries
 # ------------------------------------------------------------------------------
 dist/
+dist-release/
+dist-android/
+src-tauri/target/
 dist-web/
 build-dist/
 dist-win/

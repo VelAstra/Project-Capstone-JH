@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  # 1. BUILD WINDOWS RELEASE
+  # 1. BUILD WINDOWS RELEASE (Tauri v2 + WebView2 ~3-4 MB)
   build-windows:
     runs-on: windows-latest
     steps:
@@ -22,24 +22,38 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Tests
-        run: npm test
+      - name: Install Dependencies & Prepare Dist
+        run: |
+          npm install
+          node scripts/prepare-dist.js
 
-      - name: Build Windows Installer & Portable
-        run: npx electron-builder --win --x64
+      - name: Build Windows Tauri App
+        run: npx @tauri-apps/cli build
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package Windows Binary
+        shell: bash
+        run: |
+          mkdir -p dist-release
+          if compgen -G "src-tauri/target/release/bundle/nsis/*.exe" > /dev/null; then
+            cp src-tauri/target/release/bundle/nsis/*.exe dist-release/OmniPDF-Studio-Windows-x64.exe
+          elif compgen -G "src-tauri/target/release/bundle/msi/*.msi" > /dev/null; then
+            cp src-tauri/target/release/bundle/msi/*.msi dist-release/OmniPDF-Studio-Windows-x64.msi
+          elif compgen -G "src-tauri/target/release/*.exe" > /dev/null; then
+            cp src-tauri/target/release/*.exe dist-release/OmniPDF-Studio-Windows-x64.exe
+          fi
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: release/*.exe
+          path: dist-release/*
 
-  # 2. BUILD LINUX RELEASE (AppImage)
+  # 2. BUILD LINUX RELEASE (Tauri v2 + WebKitGTK ~5-8 MB)
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -51,24 +65,42 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Tests
-        run: npm test
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libjavascriptcoregtk-4.1-dev
 
-      - name: Build Linux AppImage
-        run: npx electron-builder --linux AppImage --x64
+      - name: Install Dependencies & Prepare Dist
+        run: |
+          npm install
+          node scripts/prepare-dist.js
+
+      - name: Build Linux Tauri App
+        run: npx @tauri-apps/cli build
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package Linux Binary
+        run: |
+          mkdir -p dist-release
+          if compgen -G "src-tauri/target/release/bundle/appimage/*.AppImage" > /dev/null; then
+            cp src-tauri/target/release/bundle/appimage/*.AppImage dist-release/OmniPDF-Studio-Linux.AppImage
+          elif compgen -G "src-tauri/target/release/bundle/deb/*.deb" > /dev/null; then
+            cp src-tauri/target/release/bundle/deb/*.deb dist-release/OmniPDF-Studio-Linux.deb
+          elif [ -f "src-tauri/target/release/omnipdf-studio" ]; then
+            cp src-tauri/target/release/omnipdf-studio dist-release/OmniPDF-Studio-Linux
+          fi
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-release
-          path: release/*.AppImage
+          path: dist-release/*
 
-  # 3. BUILD MACOS RELEASE (DMG)
+  # 3. BUILD MACOS RELEASE (Tauri v2 + WKWebView ~3-4 MB)
   build-macos:
     runs-on: macos-latest
     steps:
@@ -80,24 +112,33 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Run Tests
-        run: npm test
+      - name: Install Dependencies & Prepare Dist
+        run: |
+          npm install
+          node scripts/prepare-dist.js
 
-      - name: Build macOS DMG
-        run: npx electron-builder --mac dmg
+      - name: Build macOS Tauri App
+        run: npx @tauri-apps/cli build
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package macOS Binary
+        run: |
+          mkdir -p dist-release
+          if compgen -G "src-tauri/target/release/bundle/dmg/*.dmg" > /dev/null; then
+            cp src-tauri/target/release/bundle/dmg/*.dmg dist-release/OmniPDF-Studio-macOS.dmg
+          fi
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-release
-          path: release/*.dmg
+          path: dist-release/*
 
-  # 4. BUILD ANDROID APK RELEASE
+  # 4. BUILD ANDROID APK RELEASE (Capacitor + Android WebView ~5 MB)
   build-android:
     runs-on: ubuntu-latest
     steps:
@@ -125,7 +166,6 @@ jobs:
 
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: android-release
           path: dist-android/*.apk
@@ -164,19 +204,19 @@ jobs:
           name: android-release
           path: all-releases/android
 
-      - name: Publish GitHub Release with Standalone Platform Binaries
+      - name: Publish Clean GitHub Release with Only 4 Binaries
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.1.0' }}
-          name: "OmniPDF Studio v1.1.0 - Annotate Feature + Icon Update"
+          name: "OmniPDF Studio ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.1.0' }} - Official Multiplatform Release"
           draft: false
           prerelease: false
           generate_release_notes: false
           body: ""
           files: |
-            all-releases/windows/*.exe
-            all-releases/linux/*.AppImage
-            all-releases/macos/*.dmg
-            all-releases/android/*.apk
+            all-releases/windows/*
+            all-releases/linux/*
+            all-releases/macos/*
+            all-releases/android/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
