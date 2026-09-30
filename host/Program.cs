@@ -70,50 +70,45 @@ namespace OmniPdfStudio
                 await webView.EnsureCoreWebView2Async();
                 webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
 
-                // 1. Check local directory or parent directory
-                var indexPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "index.html"));
-                if (!File.Exists(indexPath))
-                {
-                    indexPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "index.html"));
-                }
+                // 1. Always prioritize extracting and running our own embedded bundle.zip
+                var appDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OmniPdfStudio", "web");
+                var indexPath = Path.Combine(appDataDir, "index.html");
 
-                // 2. If not found locally, extract embedded bundle to %LOCALAPPDATA%\OmniPdfStudio\web
-                if (!File.Exists(indexPath))
+                try
                 {
-                    try
+                    var assembly = Assembly.GetExecutingAssembly();
+                    var resName = Array.Find(assembly.GetManifestResourceNames(), r => r.EndsWith("bundle.zip", StringComparison.OrdinalIgnoreCase));
+                    using var resourceStream = !string.IsNullOrEmpty(resName) ? assembly.GetManifestResourceStream(resName) : null;
+
+                    if (resourceStream != null)
                     {
-                        var appDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OmniPdfStudio", "web");
-                        var appDataIndex = Path.Combine(appDataDir, "index.html");
-
-                        var assembly = Assembly.GetExecutingAssembly();
-                        var resName = Array.Find(assembly.GetManifestResourceNames(), r => r.EndsWith("bundle.zip", StringComparison.OrdinalIgnoreCase));
-                        using var resourceStream = !string.IsNullOrEmpty(resName) ? assembly.GetManifestResourceStream(resName) : null;
-
-                        if (resourceStream != null)
+                        Directory.CreateDirectory(appDataDir);
+                        using var archive = new ZipArchive(resourceStream);
+                        foreach (var entry in archive.Entries)
                         {
-                            Directory.CreateDirectory(appDataDir);
-                            using var archive = new ZipArchive(resourceStream);
-                            foreach (var entry in archive.Entries)
+                            if (string.IsNullOrEmpty(entry.Name))
                             {
-                                if (string.IsNullOrEmpty(entry.Name))
-                                {
-                                    Directory.CreateDirectory(Path.Combine(appDataDir, entry.FullName));
-                                    continue;
-                                }
-                                var destPath = Path.Combine(appDataDir, entry.FullName);
-                                Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
-                                entry.ExtractToFile(destPath, overwrite: true);
+                                Directory.CreateDirectory(Path.Combine(appDataDir, entry.FullName));
+                                continue;
                             }
-                        }
-
-                        if (File.Exists(appDataIndex))
-                        {
-                            indexPath = appDataIndex;
+                            var destPath = Path.Combine(appDataDir, entry.FullName);
+                            Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
+                            entry.ExtractToFile(destPath, overwrite: true);
                         }
                     }
-                    catch (Exception ex)
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Resource extraction note: " + ex.Message);
+                }
+
+                // 2. Only if no embedded bundle is present (e.g., local developer debug build), check parent repo
+                if (!File.Exists(indexPath))
+                {
+                    var devIndex = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "index.html"));
+                    if (File.Exists(devIndex))
                     {
-                        Console.WriteLine("Resource extraction note: " + ex.Message);
+                        indexPath = devIndex;
                     }
                 }
 
