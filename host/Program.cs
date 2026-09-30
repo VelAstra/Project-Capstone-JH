@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.WinForms;
 
-namespace PdfSuitePro
+namespace OmniPdfStudio
 {
     static class Program
     {
@@ -16,7 +16,7 @@ namespace PdfSuitePro
             
             var form = new Form
             {
-                Text = "OmniPDF Studio - PDF Suite Pro",
+                Text = "OmniPDF Studio",
                 Width = 1280,
                 Height = 850,
                 MinimumSize = new System.Drawing.Size(960, 650),
@@ -53,12 +53,12 @@ namespace PdfSuitePro
                     indexPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "index.html"));
                 }
 
-                // 2. If not found locally, extract embedded bundle to %LOCALAPPDATA%\PdfSuitePro\web
+                // 2. If not found locally, extract embedded bundle to %LOCALAPPDATA%\OmniPdfStudio\web
                 if (!File.Exists(indexPath))
                 {
                     try
                     {
-                        var appDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PdfSuitePro", "web");
+                        var appDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OmniPdfStudio", "web");
                         var appDataIndex = Path.Combine(appDataDir, "index.html");
 
                         var assembly = Assembly.GetExecutingAssembly();
@@ -73,7 +73,6 @@ namespace PdfSuitePro
                             {
                                 if (string.IsNullOrEmpty(entry.Name))
                                 {
-                                    // Directory entry
                                     Directory.CreateDirectory(Path.Combine(appDataDir, entry.FullName));
                                     continue;
                                 }

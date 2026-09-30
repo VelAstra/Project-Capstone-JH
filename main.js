@@ -8,7 +8,7 @@ function createWindow() {
     height: 850,
     minWidth: 960,
     minHeight: 650,
-    title: "PDF Suite Pro",
+    title: "OmniPDF Studio",
     icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       nodeIntegration: false,

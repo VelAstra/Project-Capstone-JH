@@ -1,4 +1,4 @@
-# Project-Capstone-JH: OmniPDF Studio (PDF Suite Pro)
+# Project-Capstone-JH: OmniPDF Studio
 
 > **Project Capstone** dibawah bimbingan **Bapak Janoe Hendarto**  
 > Aplikasi Manipulasi PDF Multiplatform Lokal & 100% Offline (Windows, Linux, macOS, dan Android).  
@@ -13,8 +13,8 @@ Pengguna tidak perlu menjalankan terminal atau instalasi rumit. Cukup unduh satu
 | Platform | Format Berkas | Tautan Unduhan Langsung | Keterangan |
 | :--- | :--- | :--- | :--- |
 | 🪟 **Windows** | `.exe` (Full Installer) | [Unduh OmniPDF-Studio-Windows-x64.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows-x64.exe) | Installer lengkap Electron (NSIS & Portable). |
-| 🪟 **Windows (Lite)** | `.exe` (Single File) | [Unduh PDFSuitePro-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/PDFSuitePro-Windows.exe) | Standalone WebView2 Executable (2.9 MB), tinggal klik 2x langsung jalan tanpa install. |
-| 📱 **Android** | `.apk` | [Unduh PDFSuitePro-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/PDFSuitePro-Android.apk) | Berkas paket Android mandiri, langsung install di HP/Tablet. |
+| 🪟 **Windows (Lite)** | `.exe` (Single File) | [Unduh OmniPDF-Studio-Windows.exe](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Windows.exe) | Standalone WebView2 Executable (3.1 MB), tinggal klik 2x langsung jalan tanpa install. |
+| 📱 **Android** | `.apk` | [Unduh OmniPDF-Studio-Android.apk](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Android.apk) | Berkas paket Android mandiri, langsung install di HP/Tablet. |
 | 🐧 **Linux** | `.AppImage` | [Unduh OmniPDF-Studio-Linux.AppImage](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-Linux.AppImage) | Format universal Linux portable, cukup beri izin eksekusi (`chmod +x`). |
 | 🍎 **macOS** | `.dmg` | [Unduh OmniPDF-Studio-macOS.dmg](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/OmniPDF-Studio-macOS.dmg) | Disk image resmi untuk Intel & Apple Silicon (M1/M2/M3/M4). |
 
@@ -22,7 +22,7 @@ Pengguna tidak perlu menjalankan terminal atau instalasi rumit. Cukup unduh satu
 
 ## 🌐 1. Daftar Lengkap 26+ Fitur Manipulasi PDF
 
-Aplikasi ini mengadopsi seluruh rangkaian fitur lengkap dari **PDF-Suite-Pro** yang berjalan secara mandiri (*client-side*):
+OmniPDF Studio menyediakan rangkaian fitur manipulasi PDF terlengkap yang berjalan secara mandiri (*client-side*):
 
 ### 📄 A. Manipulasi Halaman (Manipulate PDF)
 1. **Merge PDF**: Menggabungkan banyak file PDF menjadi satu berkas secara berurutan. Mendukung pemilihan file dalam jumlah tak terbatas.

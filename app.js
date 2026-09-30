@@ -1,4 +1,4 @@
-/* Application Orchestrator - PDF Suite Pro */
+/* Application Orchestrator - OmniPDF Studio */
 // Global state
 let activeTab = 'dashboard';
 let uploadedFiles = [];
