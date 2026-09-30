@@ -1126,32 +1126,47 @@ async function runCompress() {
 /* Action: OCR */
 async function runOcr() {
   const file = currentFileToProcess || uploadedFiles[0];
-  const lang = document.getElementById('ocr-lang').value;
+  const langEl = document.getElementById('ocr-lang');
+  const lang = langEl ? langEl.value : 'eng';
   
-  const ocrText = await pdfTools.ocrPdf(file, lang, (current, total, phase) => {
-    const base = phase === 'extracting' ? 0 : 45;
-    const factor = phase === 'extracting' ? 40 : 45;
-    const percent = Math.floor((current / total) * factor) + base + 5;
-    const desc = phase === 'extracting' ? `Extracting page ${current}/${total}` : `Performing OCR on page ${current}/${total}`;
-    updateProgress(percent, desc);
-  });
+  const formatEl = document.querySelector('input[name="ocr-output-format"]:checked');
+  const outputFormat = formatEl ? formatEl.value : 'pdf';
   
-  updateProgress(95, "Compiling text summary file");
-  
-  // Convert text string to bytes for download
-  const enc = new TextEncoder();
-  processedFileBytes = enc.encode(ocrText);
-  processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_ocr.txt`;
-  processedFileType = 'text/plain';
-  
-  updateProgress(100, "OCR Done");
-  showResultPanel(processedFileName, processedFileBytes.length);
-  
-  // Display text preview inside Workspace
-  const preview = document.getElementById('ai-text-preview');
-  const previewBox = document.getElementById('ai-summary-result-box');
-  if (preview) {
-    preview.value = ocrText;
+  if (outputFormat === 'pdf') {
+    updateProgress(5, "Analyzing PDF layout");
+    const bytes = await pdfTools.ocrPdfToSearchablePdf(file, lang, (current, total, phase) => {
+      const base = phase === 'extracting' ? 5 : 45;
+      const factor = phase === 'extracting' ? 40 : 45;
+      const percent = Math.floor((current / total) * factor) + base;
+      const desc = phase === 'extracting' ? `Extracting page ${current}/${total}` : `Performing OCR on page ${current}/${total}`;
+      updateProgress(percent, desc);
+    });
+    
+    updateProgress(95, "Embedding searchable text layer");
+    processedFileBytes = bytes;
+    processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_searchable.pdf`;
+    processedFileType = 'application/pdf';
+    
+    updateProgress(100, "Searchable PDF Ready");
+    showResultPanel(processedFileName, processedFileBytes.length);
+  } else {
+    updateProgress(5, "Extracting text content");
+    const ocrText = await pdfTools.ocrPdf(file, lang, (current, total, phase) => {
+      const base = phase === 'extracting' ? 5 : 45;
+      const factor = phase === 'extracting' ? 40 : 45;
+      const percent = Math.floor((current / total) * factor) + base;
+      const desc = phase === 'extracting' ? `Extracting page ${current}/${total}` : `Performing OCR on page ${current}/${total}`;
+      updateProgress(percent, desc);
+    });
+    
+    updateProgress(95, "Compiling recognized text");
+    const enc = new TextEncoder();
+    processedFileBytes = enc.encode(ocrText);
+    processedFileName = `${file.name.replace(/\.[^/.]+$/, "")}_ocr.txt`;
+    processedFileType = 'text/plain';
+    
+    updateProgress(100, "OCR Done");
+    showResultPanel(processedFileName, processedFileBytes.length);
   }
 }
 

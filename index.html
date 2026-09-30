@@ -578,18 +578,38 @@
     <!-- Config: OCR -->
     <div id="tpl-ocr">
       <div class="form-group">
-        <label for="ocr-lang">Language for OCR</label>
+        <label>Output Format</label>
+        <div class="radio-card-group">
+          <label class="radio-card">
+            <input type="radio" name="ocr-output-format" value="pdf" checked>
+            <div class="radio-card-content">
+              <strong>Searchable PDF (.pdf)</strong>
+              <span>Embed OCR text layer so scanned text becomes searchable (Ctrl+F) and selectable.</span>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="ocr-output-format" value="txt">
+            <div class="radio-card-content">
+              <strong>Plain Text (.txt)</strong>
+              <span>Extract all recognized text into a clean text document.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="ocr-lang">Recognition Language</label>
         <select id="ocr-lang" class="form-select">
-          <option value="eng">English</option>
-          <option value="ind">Indonesian</option>
-          <option value="spa">Spanish</option>
-          <option value="fra">French</option>
-          <option value="deu">German</option>
+          <option value="eng" selected>English</option>
+          <option value="ind">Indonesian (Bahasa Indonesia)</option>
+          <option value="spa">Spanish (Español)</option>
+          <option value="fra">French (Français)</option>
+          <option value="deu">German (Deutsch)</option>
+          <option value="ita">Italian (Italiano)</option>
+          <option value="por">Portuguese (Português)</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Output Format</label>
-        <span class="info-block">The OCR process will extract text content from the pages, and embed it as a searchable text layer in the output PDF file.</span>
+        <span class="info-block"><i class="fa-solid fa-shield-halved"></i> 100% Private: Optical Character Recognition runs locally in your browser sandbox. Documents never leave your device.</span>
       </div>
     </div>
 

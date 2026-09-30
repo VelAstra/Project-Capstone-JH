@@ -231,29 +231,44 @@ async function ocrPdf(file, lang, progressCallback) {
   let fullText = "";
   
   try {
-    // Tesseract library is loaded globally as Tesseract
     for (let i = 1; i <= numPages; i++) {
       if (progressCallback) progressCallback(i, numPages, 'extracting');
       
       const page = await pdfDoc.getPage(i);
-      const viewport = page.getViewport({ scale: 2.0 });
       
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
+      // 1. Digital text check
+      let pageText = '';
+      try {
+        const textContent = await page.getTextContent();
+        if (textContent.items && textContent.items.length > 0) {
+          pageText = textContent.items.map(item => item.str).join(' ');
+        }
+      } catch { }
       
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      // 2. If scanned or sparse, run OCR via Tesseract
+      if (!pageText || pageText.trim().length < 10) {
+        if (progressCallback) progressCallback(i, numPages, 'recognizing');
+        try {
+          const viewport = page.getViewport({ scale: 2.0 });
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          
+          await page.render({ canvasContext: context, viewport: viewport }).promise;
+          
+          if (window.Tesseract && typeof window.Tesseract.recognize === 'function') {
+            const result = await window.Tesseract.recognize(canvas, lang);
+            pageText = result.data.text || '';
+          }
+          canvas.width = 0;
+          canvas.height = 0;
+        } catch (err) {
+          console.warn(`OCR recognition error on page ${i}:`, err);
+        }
+      }
       
-      if (progressCallback) progressCallback(i, numPages, 'recognizing');
-      
-      // Perform OCR via global Tesseract
-      const result = await window.Tesseract.recognize(canvas, lang);
-      fullText += `--- Page ${i} ---\n\n${result.data.text}\n\n`;
-
-      // Free canvas bitmap and page font caches immediately
-      canvas.width = 0;
-      canvas.height = 0;
+      fullText += `--- Page ${i} ---\n\n${pageText.trim()}\n\n`;
       page.cleanup();
     }
     
@@ -264,6 +279,108 @@ async function ocrPdf(file, lang, progressCallback) {
       await pdfDoc.destroy();
     } catch { }
   }
+}
+
+/**
+ * Perform OCR on a PDF and embed recognized text as an invisible searchable text layer
+ * @param {File} file 
+ * @param {string} lang 
+ * @param {function} progressCallback 
+ * @returns {Promise<Uint8Array>}
+ */
+async function ocrPdfToSearchablePdf(file, lang, progressCallback) {
+  const arrayBuffer = await file.arrayBuffer();
+  
+  // 1. Get OCR text per page using pdf.js and Tesseract
+  const pdfjsLib = window.pdfjsLib;
+  const pdfData = new Uint8Array(arrayBuffer);
+  const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+  const pdfDoc = await loadingTask.promise;
+  const numPages = pdfDoc.numPages;
+  
+  const pageTexts = [];
+  
+  try {
+    for (let i = 1; i <= numPages; i++) {
+      if (progressCallback) progressCallback(i, numPages, 'extracting');
+      const page = await pdfDoc.getPage(i);
+      
+      let pageText = '';
+      try {
+        const textContent = await page.getTextContent();
+        if (textContent.items && textContent.items.length > 0) {
+          pageText = textContent.items.map(item => item.str).join(' ');
+        }
+      } catch { }
+      
+      if (!pageText || pageText.trim().length < 10) {
+        if (progressCallback) progressCallback(i, numPages, 'recognizing');
+        try {
+          const viewport = page.getViewport({ scale: 2.0 });
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          await page.render({ canvasContext: context, viewport: viewport }).promise;
+          
+          if (window.Tesseract && typeof window.Tesseract.recognize === 'function') {
+            const res = await window.Tesseract.recognize(canvas, lang);
+            pageText = res.data.text || '';
+          }
+          canvas.width = 0;
+          canvas.height = 0;
+        } catch (err) {
+          console.warn(`OCR recognizing error on page ${i}:`, err);
+        }
+      }
+      
+      page.cleanup();
+      pageTexts.push(pageText);
+    }
+  } finally {
+    try {
+      await pdfDoc.cleanup();
+      await pdfDoc.destroy();
+    } catch { }
+  }
+  
+  // 2. Load into pdf-lib to embed the searchable text layer
+  const PDFLib = window.PDFLib;
+  const targetPdf = await PDFLib.PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+  const helveticaFont = await targetPdf.embedFont(PDFLib.StandardFonts.Helvetica);
+  const pages = targetPdf.getPages();
+  
+  for (let i = 0; i < pages.length; i++) {
+    const page = pages[i];
+    const text = pageTexts[i] || '';
+    if (!text.trim()) continue;
+    
+    const { width, height } = page.getSize();
+    const lines = text.split('\n').filter(l => l.trim().length > 0);
+    const lineHeight = 12;
+    const fontSize = 9;
+    let y = height - 20;
+    
+    for (const line of lines) {
+      if (y < 20) break;
+      const cleanLine = line.replace(/[^\x20-\x7E\xA0-\xFF]/g, ' ').substring(0, 120);
+      if (cleanLine.trim()) {
+        try {
+          page.drawText(cleanLine, {
+            x: 20,
+            y: y,
+            size: fontSize,
+            font: helveticaFont,
+            color: PDFLib.rgb(0, 0, 0),
+            opacity: 0.001
+          });
+        } catch { }
+      }
+      y -= lineHeight;
+    }
+  }
+  
+  return await targetPdf.save();
 }
 
 /**
@@ -1242,6 +1359,7 @@ window.pdfTools = {
   organizePdf, 
   compressPdf, 
   ocrPdf, 
+  ocrPdfToSearchablePdf, 
   jpgToPdf, 
   pdfToJpg, 
   pdfToText, 
