@@ -37,6 +37,7 @@
         </div>
         <div class="logo-text">
           <h2>OmniPDF <span>Studio</span></h2>
+
         </div>
       </div>
       
@@ -54,7 +55,6 @@
 
         <div class="nav-section-title">Edit & Add</div>
         <a href="#edit" class="nav-item" data-tab="edit"><i class="fa-solid fa-pen-to-square"></i> Edit PDF</a>
-        <a href="#annotate" class="nav-item" data-tab="annotate"><i class="fa-solid fa-highlighter"></i> Annotate PDF</a>
         <a href="#sign" class="nav-item" data-tab="sign"><i class="fa-solid fa-signature"></i> Sign PDF</a>
         <a href="#watermark" class="nav-item" data-tab="watermark"><i class="fa-solid fa-stamp"></i> Watermark</a>
         <a href="#page-numbers" class="nav-item" data-tab="page-numbers"><i class="fa-solid fa-hashtag"></i> Page Numbers</a>
@@ -91,6 +91,10 @@
         <button id="btn-settings" class="btn-sidebar-settings">
           <i class="fa-solid fa-gear"></i> Keys & Settings
         </button>
+        <div class="security-toast">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Local execution. No servers.</span>
+        </div>
       </div>
     </aside>
 
@@ -102,7 +106,10 @@
           <input type="text" id="search-tools" placeholder="Search for a tool (e.g. Merge, OCR, Protect)...">
         </div>
         <div class="header-actions">
-          
+          <div class="status-indicator">
+            <span class="status-dot green"></span>
+
+          </div>
           <button id="theme-toggle" class="theme-btn">
             <i class="fa-solid fa-sun"></i>
           </button>
@@ -167,10 +174,6 @@
               <div class="tool-card" data-target="edit">
                 <div class="tool-icon gradient-orange"><i class="fa-solid fa-pen-to-square"></i></div>
                 <h4>Edit PDF</h4><p>Visually add text, images, and drawings to pages.</p>
-              </div>
-              <div class="tool-card" data-target="annotate">
-                <div class="tool-icon gradient-yellow"><i class="fa-solid fa-highlighter"></i></div>
-                <h4>Annotate PDF</h4><p>Highlight text, add sticky notes, draw shapes, and free-draw on pages.</p>
               </div>
               <div class="tool-card" data-target="sign">
                 <div class="tool-icon gradient-rose"><i class="fa-solid fa-signature"></i></div>
@@ -706,75 +709,6 @@
       </div>
     </div>
 
-    <!-- Config: Annotate PDF -->
-    <div id="tpl-annotate">
-      <p class="config-desc">Add highlights, sticky notes, shapes, and freehand drawings directly onto PDF pages.</p>
-
-      <div class="form-group">
-        <label>Annotation Tool</label>
-        <div class="radio-card-group">
-          <label class="radio-card">
-            <input type="radio" name="annotate-tool" value="highlight" checked>
-            <div class="radio-card-content">
-              <strong><i class="fa-solid fa-highlighter"></i> Highlight</strong>
-              <span>Draw a coloured highlight strip over text.</span>
-            </div>
-          </label>
-          <label class="radio-card">
-            <input type="radio" name="annotate-tool" value="sticky">
-            <div class="radio-card-content">
-              <strong><i class="fa-solid fa-note-sticky"></i> Sticky Note</strong>
-              <span>Place a comment note on the page.</span>
-            </div>
-          </label>
-          <label class="radio-card">
-            <input type="radio" name="annotate-tool" value="rectangle">
-            <div class="radio-card-content">
-              <strong><i class="fa-regular fa-square"></i> Rectangle</strong>
-              <span>Draw an outlined rectangle shape.</span>
-            </div>
-          </label>
-          <label class="radio-card">
-            <input type="radio" name="annotate-tool" value="freedraw">
-            <div class="radio-card-content">
-              <strong><i class="fa-solid fa-pen"></i> Free Draw</strong>
-              <span>Draw freehand strokes on the page.</span>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="annotate-color">Annotation Color</label>
-        <input type="color" id="annotate-color" class="form-color" value="#FFFF00">
-      </div>
-
-      <div class="form-group" id="annotate-opacity-group">
-        <label for="annotate-opacity">Opacity</label>
-        <input type="range" id="annotate-opacity" min="0.1" max="1" step="0.05" class="form-range" value="0.5">
-      </div>
-
-      <div class="form-group" id="annotate-stroke-group">
-        <label for="annotate-stroke-width">Stroke Width (px)</label>
-        <input type="number" id="annotate-stroke-width" class="form-control" value="3" min="1" max="20">
-      </div>
-
-      <div class="form-group" id="annotate-note-group" style="display:none;">
-        <label for="annotate-note-text">Note Text</label>
-        <textarea id="annotate-note-text" class="form-textarea" rows="3" placeholder="Enter your note here..."></textarea>
-      </div>
-
-      <div class="form-group">
-        <button id="btn-annotate-clear" class="btn-secondary w-100" style="color:var(--danger);border-color:var(--danger);">
-          <i class="fa-solid fa-trash-can"></i> Clear All Annotations
-        </button>
-      </div>
-
-      <div class="form-group">
-        <div class="info-block italic text-center" id="annotate-status">Load a PDF and click on the page to annotate.</div>
-      </div>
-    </div>
-
     <!-- Config: Watermark -->
     <div id="tpl-watermark">
       <div class="form-group">
@@ -1030,7 +964,6 @@
   <script src="pdf-tools.js"></script>
   <script src="signature-pad-modal.js"></script>
   <script src="pdf-editor.js"></script>
-  <script src="annotate.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

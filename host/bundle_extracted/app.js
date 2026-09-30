@@ -23,7 +23,7 @@ const APP_CONFIG = {
     DEFAULT_OPENAI_MODEL: 'gpt-4o-mini'
   },
   TOOL_GROUPS: {
-    VISUAL: new Set(['organize', 'rotate', 'remove', 'extract', 'edit', 'annotate', 'sign']),
+    VISUAL: new Set(['organize', 'rotate', 'remove', 'extract', 'edit', 'sign']),
     MULTI_INPUT: new Set(['merge', 'jpg-to-pdf']),
     NO_UPLOAD: new Set(['html-to-pdf'])
   }
@@ -137,7 +137,6 @@ const tools = {
   
   // 2. Edit & Add
   edit: { title: "Edit PDF", icon: "fa-pen-to-square", class: "gradient-orange", desc: "Visually add text, images, and drawings to pages.", limits: "Supports multiple .pdf files" },
-  annotate: { title: "Annotate PDF", icon: "fa-highlighter", class: "gradient-yellow", desc: "Highlight text, add sticky notes, draw shapes, and free-draw on pages.", limits: "Supports multiple .pdf files" },
   sign: { title: "Sign PDF", icon: "fa-signature", class: "gradient-rose", desc: "Draw and place signatures visually on documents.", limits: "Supports multiple .pdf files" },
   watermark: { title: "Watermark", icon: "fa-stamp", class: "gradient-violet", desc: "Add text overlay with custom font, angle & transparency.", limits: "Supports multiple .pdf files" },
   'page-numbers': { title: "Page Numbers", icon: "fa-hashtag", class: "gradient-cyan", desc: "Add page numbers with custom layout & formatting.", limits: "Supports multiple .pdf files" },
@@ -458,8 +457,6 @@ function handleSelectedFiles(filesList) {
     renderSignWorkspace(uploadedFiles[0]);
   } else if (activeTab === 'edit' && uploadedFiles.length > 0) {
     renderEditWorkspace(uploadedFiles[0]);
-  } else if (activeTab === 'annotate' && uploadedFiles.length > 0) {
-    renderAnnotateWorkspace(uploadedFiles[0]);
   }
 }
 
@@ -1057,7 +1054,6 @@ const TOOL_ACTIONS = {
   translate: () => runTranslate(),
   'pages-per-sheet': () => runPagesPerSheet(),
   edit: () => runEdit(),
-  annotate: () => runAnnotate(),
   'flatten-pdf': () => runFlattenPdf(),
   'edit-metadata': () => runEditMetadata(),
   'crop-pdf': () => runCropPdf(),
@@ -1683,100 +1679,4 @@ async function runEdit() {
   // Clean up
   pdfEditor.teardownEditor();
   pdfEditor.clearAllEdits();
-}
-
-/* ---- Annotate Workspace ---- */
-async function renderAnnotateWorkspace(file) {
-  const container = document.getElementById('interactive-workspace');
-  if (!container) return;
-
-  if (!file || file.type !== 'application/pdf') {
-    container.innerHTML = '<div class="info-block italic text-center">Please upload a valid PDF file to annotate.</div>';
-    return;
-  }
-
-  container.style.display = 'block';
-  container.innerHTML = `
-    <div class="workspace-bar">
-      <h3><i class="fa-solid fa-highlighter"></i> PDF Annotator</h3>
-      <div class="workspace-bar-actions">
-        <button id="btn-ann-prev" class="btn-secondary btn-sm"><i class="fa-solid fa-chevron-left"></i></button>
-        <span id="ann-page-indicator" style="font-size:13px;font-weight:600;">Page 1</span>
-        <button id="btn-ann-next" class="btn-secondary btn-sm"><i class="fa-solid fa-chevron-right"></i></button>
-      </div>
-    </div>
-    <div class="pdf-placement-viewer" style="background-color: var(--bg-sidebar);">
-      <div class="placement-canvas-container" id="ann-canvas-container" style="position:relative;">
-        <canvas id="ann-preview-canvas"></canvas>
-        <div id="ann-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
-      </div>
-    </div>
-  `;
-
-  elements.btnProcess.disabled = false;
-
-  try {
-    const pagesInfo = await pdfTools.getPdfPageInfo(file);
-    let currentPage = 0;
-    window._annotatePagesInfo = {};
-
-    const renderPage = async (index) => {
-      currentPage = index;
-      document.getElementById('ann-page-indicator').textContent = `Page ${index + 1} of ${pagesInfo.length}`;
-
-      const canvas  = document.getElementById('ann-preview-canvas');
-      const ctnr    = document.getElementById('ann-canvas-container');
-      const overlay = document.getElementById('ann-overlay');
-
-      if (window.pdfAnnotator) pdfAnnotator.teardownAnnotator();
-
-      const { width, height } = await pdfTools.renderPdfPageToCanvas(file, index, canvas, 1.2);
-      ctnr.style.width  = `${width}px`;
-      ctnr.style.height = `${height}px`;
-
-      window._annotatePagesInfo[index] = {
-        canvasWidth: width, canvasHeight: height,
-        pdfWidth: pagesInfo[index].width, pdfHeight: pagesInfo[index].height
-      };
-
-      if (window.pdfAnnotator) pdfAnnotator.initAnnotator(overlay, index, width, height);
-    };
-
-    await renderPage(0);
-
-    document.getElementById('btn-ann-prev').addEventListener('click', () => { if (currentPage > 0) renderPage(currentPage - 1); });
-    document.getElementById('btn-ann-next').addEventListener('click', () => { if (currentPage < pagesInfo.length - 1) renderPage(currentPage + 1); });
-
-  } catch (err) {
-    console.error('Annotate workspace error:', err);
-    container.innerHTML = '<div class="info-block italic text-center" style="color:var(--danger);">Failed to render PDF page for annotation.</div>';
-  }
-}
-
-async function runAnnotate() {
-  const file = uploadedFiles[0];
-  if (!file) throw new Error('No file uploaded.');
-
-  if (window.pdfAnnotator) pdfAnnotator.teardownAnnotator();
-
-  updateProgress(20, 'Loading PDF');
-  const { PDFLib } = window;
-  if (!PDFLib) throw new Error('PDF-Lib not loaded.');
-
-  const arrayBuffer = await file.arrayBuffer();
-  updateProgress(40, 'Applying annotations');
-  const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-
-  // Temporarily set canvasWidth/Height from first page info
-  const pi = window._annotatePagesInfo || {};
-  const firstInfo = pi[0] || { canvasWidth: 800, canvasHeight: 1131 };
-  // Patch annotator canvas dims so burns scale correctly
-  window.pdfAnnotator._canvasWidth  = firstInfo.canvasWidth;
-  window.pdfAnnotator._canvasHeight = firstInfo.canvasHeight;
-
-  await pdfAnnotator.burnAnnotationsIntoPdf(pdfDoc);
-  updateProgress(80, 'Saving PDF');
-
-  const pdfBytes = await pdfDoc.save();
-  completeProcessing(new Uint8Array(pdfBytes), `${getBaseFilename(file)}_annotated.pdf`);
 }

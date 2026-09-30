@@ -1,7 +1,7 @@
 {
   "name": "omnipdf-studio",
   "productName": "OmniPDF Studio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "100% Client-Side Offline Multiplatform PDF Suite (Windows, Linux, macOS, Android)",
   "main": "main.js",
   "scripts": {
@@ -60,12 +60,14 @@
       "pdf-tools.js",
       "signature-pad-modal.js",
       "pdf-editor.js",
+      "annotate.js",
       "main.js",
       "preload.js",
       "package.json",
       "assets/**/*",
       "icon.png",
-      "icon.ico"
+      "icon.ico",
+      "icon.svg"
     ]
   },
   "keywords": [

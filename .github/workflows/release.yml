@@ -160,11 +160,28 @@ jobs:
       - name: Publish GitHub Release with Standalone Platform Binaries
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: "OmniPDF Studio v1.0.0 - Official Multiplatform Release"
+          tag_name: ${{ github.ref_name != 'refs/heads/main' && github.ref_name || 'v1.1.0' }}
+          name: "OmniPDF Studio v1.1.0 - Annotate Feature + Icon Update"
           draft: false
           prerelease: false
-          generate_release_notes: false
+          generate_release_notes: true
+          body: |
+            ## OmniPDF Studio v1.1.0 Release Notes
+            
+            ### ✨ New Features
+            - **Annotate PDF**: Full annotation system — highlight, sticky notes, rectangle shapes, and freehand drawing. Annotations are burned directly into the exported PDF.
+            
+            ### 🎨 UI Improvements
+            - Removed "100% Client-Side", "Private Sandbox Active", and "Local execution. No servers." marketing labels from the interface
+            - Updated application icon to use the new OmniPDF Studio SVG design across taskbar, window bar, and installers
+            
+            ### 📦 Downloads
+            | Platform | Installer |
+            |----------|-----------|
+            | Windows  | `.exe` (NSIS installer) + Portable `.exe` |
+            | Linux    | `.AppImage` |
+            | macOS    | `.dmg` |
+            | Android  | `.apk` |
           files: |
             all-releases/windows/*
             all-releases/linux/*

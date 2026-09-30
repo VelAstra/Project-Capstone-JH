@@ -14,6 +14,12 @@ app.commandLine.appendSwitch('disable-speech-api');
 app.commandLine.appendSwitch('disable-breakpad');
 app.commandLine.appendSwitch('disable-print-preview');
 
+function getIconPath() {
+  if (process.platform === 'win32') return path.join(__dirname, 'icon.ico');
+  if (process.platform === 'linux') return path.join(__dirname, 'icon.png');
+  return path.join(__dirname, 'icon.png');
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
@@ -21,7 +27,7 @@ function createWindow() {
     minWidth: 960,
     minHeight: 650,
     title: "OmniPDF Studio",
-    icon: path.join(__dirname, 'icon.png'),
+    icon: getIconPath(),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
