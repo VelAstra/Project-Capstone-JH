@@ -67,13 +67,11 @@ namespace OmniPdfStudio
 
             form.Load += async (s, e) =>
             {
-                await webView.EnsureCoreWebView2Async();
-                webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                var omniDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OmniPdfStudio");
+                var appDataDir = Path.Combine(omniDir, "web");
+                var userDataDir = Path.Combine(omniDir, "webview_profile");
 
-                // 1. Always prioritize extracting and running our own embedded bundle.zip
-                var appDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OmniPdfStudio", "web");
-                var indexPath = Path.Combine(appDataDir, "index.html");
-
+                // 1. Cleanly extract embedded bundle.zip to appDataDir
                 try
                 {
                     var assembly = Assembly.GetExecutingAssembly();
@@ -102,23 +100,42 @@ namespace OmniPdfStudio
                     Console.WriteLine("Resource extraction note: " + ex.Message);
                 }
 
-                // 2. Only if no embedded bundle is present (e.g., local developer debug build), check parent repo
-                if (!File.Exists(indexPath))
-                {
-                    var devIndex = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "index.html"));
-                    if (File.Exists(devIndex))
-                    {
-                        indexPath = devIndex;
-                    }
-                }
+                // 2. Initialize isolated WebView2 Environment (prevents saving cache/profile next to executable or in Downloads)
+                Directory.CreateDirectory(userDataDir);
+                var webViewEnv = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(null, userDataDir);
+                await webView.EnsureCoreWebView2Async(webViewEnv);
+                webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
 
+                // 3. Bind virtual host mapping directly to appDataDir (guarantees HTTPS origin and prevents cross-file bleed)
+                var indexPath = Path.Combine(appDataDir, "index.html");
                 if (File.Exists(indexPath))
                 {
-                    webView.Source = new Uri(indexPath);
+                    webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                        "omnipdf.local",
+                        appDataDir,
+                        Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow
+                    );
+                    webView.Source = new Uri("https://omnipdf.local/index.html");
                 }
                 else
                 {
-                    MessageBox.Show($"OmniPDF Studio interface could not be loaded at {indexPath}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Fallback for debug/development runs directly in repo folder
+                    var devIndex = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "index.html"));
+                    if (File.Exists(devIndex))
+                    {
+                        var devDir = Path.GetDirectoryName(devIndex)!;
+                        webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                            "omnipdf.local",
+                            devDir,
+                            Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow
+                        );
+                        webView.Source = new Uri("https://omnipdf.local/index.html");
+                    }
+                    else
+                    {
+                        MessageBox.Show("OmniPDF Studio interface bundle could not be found. Please reinstall the application.", "OmniPDF Studio Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             };
 

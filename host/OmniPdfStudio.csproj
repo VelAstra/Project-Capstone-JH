@@ -9,6 +9,7 @@
     <AssemblyName>OmniPdfStudio</AssemblyName>
     <ApplicationIcon>..\icon.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
