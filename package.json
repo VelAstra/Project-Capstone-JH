@@ -1,0 +1,16 @@
+{
+  "name": "aeromark",
+  "version": "1.0.0",
+  "description": "AeroMark - Modern Markdown Editor & Reader (Capstone Project)",
+  "main": "electron-main.cjs",
+  "scripts": {
+    "pack:linux": "electron-builder --linux AppImage",
+    "pack:mac": "electron-builder --mac dmg"
+  },
+  "author": "VelAstra",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

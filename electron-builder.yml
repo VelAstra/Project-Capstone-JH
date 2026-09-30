@@ -1,0 +1,26 @@
+appId: com.velastra.aeromark
+productName: AeroMark
+directories:
+  output: dist-electron
+
+files:
+  - html/**/*
+  - electron-main.cjs
+  - preload.cjs
+  - package.json
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  category: Utility
+  artifactName: AeroMark-Linux.${ext}
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - universal
+  category: public.app-category.utilities
+  artifactName: AeroMark-macOS.${ext}

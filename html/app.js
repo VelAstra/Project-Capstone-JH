@@ -144,8 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnOpen = document.getElementById('btn-open');
     const btnSave = document.getElementById('btn-save');
 
-    btnOpen.addEventListener('click', () => {
-        if (window.chrome && window.chrome.webview) {
+    btnOpen.addEventListener('click', async () => {
+        if (window.electronAPI) {
+            const files = await window.electronAPI.openFiles();
+            if (files && files.length > 0) {
+                loadFiles(files);
+            }
+        } else if (window.chrome && window.chrome.webview) {
             window.chrome.webview.postMessage(JSON.stringify({ type: 'open_file_dialog' }));
         } else if (window.Android) {
             window.Android.openFileDialog();
@@ -173,8 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    btnSave.addEventListener('click', () => {
-        if (currentFilePath && window.chrome && window.chrome.webview) {
+    btnSave.addEventListener('click', async () => {
+        if (window.electronAPI) {
+            const res = await window.electronAPI.saveFile({ filePath: currentFilePath, content: editor.value });
+            if (res) {
+                currentFilePath = res.path;
+                currentFilename.innerText = res.name;
+            }
+        } else if (currentFilePath && window.chrome && window.chrome.webview) {
             window.chrome.webview.postMessage(JSON.stringify({ 
                 type: 'save_file', 
                 path: currentFilePath, 

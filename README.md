@@ -82,11 +82,18 @@ Buka file [`html/index.html`](file:///c:/Users/Rayhan/Documents/GitHub/Project-C
 
 ---
 
-## 📦 Rilis & Paket Download
+## 📦 Rilis & Paket Download (Single-File Installers untuk 4 OS)
 
-Unduh berkas rilis resmi langsung di halaman [GitHub Releases](https://github.com/VelAstra/Project-Capstone-JH/releases):
-* **`AeroMark-v1.0.0-windows-x64.zip`**: Paket aplikasi desktop Windows portabel (.exe) mandiri.
-* **`AeroMark-v1.0.0-web-standalone.zip`**: Paket antarmuka web mandiri untuk Linux, macOS, dan Android.
+AeroMark menyediakan berkas installer/executable tunggal (*single file*) untuk setiap sistem operasi tanpa perlu instalasi rumit melalui CLI. Pengguna cukup mengunduh 1 file dan langsung klik untuk menggunakan:
+
+| Sistem Operasi | Berkas Rilis (Tinggal Klik) | Format | Deskripsi |
+| :--- | :--- | :---: | :--- |
+| 🪟 **Windows** | [**`AeroMark-Windows.exe`**](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/AeroMark-Windows.exe) | `.exe` | Single-file mandiri (.NET 10 WebView2), dobel klik langsung jalan tanpa install runtime. |
+| 🐧 **Linux** | [**`AeroMark-Linux.AppImage`**](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/AeroMark-Linux.AppImage) | `.AppImage` | Format universal Linux x64, dobel klik langsung jalan di Ubuntu, Fedora, Debian, dll. |
+| 🍏 **macOS** | [**`AeroMark-macOS.dmg`**](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/AeroMark-macOS.dmg) | `.dmg` | Disk image universal (Apple Silicon M-Series & Intel), drag ke folder Applications. |
+| 🤖 **Android** | [**`AeroMark-Android.apk`**](https://github.com/VelAstra/Project-Capstone-JH/releases/download/v1.0.0/AeroMark-Android.apk) | `.apk` | Paket instalasi mandiri Android, tap untuk memasang di smartphone atau tablet. |
+
+Semua rilis resmi tersedia di halaman [**GitHub Releases**](https://github.com/VelAstra/Project-Capstone-JH/releases).
 
 ---
 
